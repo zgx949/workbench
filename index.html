@@ -1,0 +1,2292 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport">
+<title>自媒体运营工作台｜本地演示版</title>
+<meta content="#FF6F91" name="theme-color">
+<meta content="yes" name="apple-mobile-web-app-capable">
+<meta content="default" name="apple-mobile-web-app-status-bar-style">
+<meta content="自媒体运营工作台" name="apple-mobile-web-app-title">
+<meta content="yes" name="mobile-web-app-capable">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#F7F5F1; --card:#FFFFFF; --ink:#231F1C; --ink2:#5C554E; --ink3:#948C83;
+  --line:#EAE4DC; --line2:#F4EFE9;
+  --brand:#FF6F91; --brand2:#FF9AA8; --brand-soft:#FFE9EF;
+  --ok:#2E7D52; --ok-soft:#E9F4EE;
+  --warn:#B4761A; --warn-soft:#FDF3E3;
+  --red:#C4362F; --red-soft:#FCEDEC;
+  --r:16px;
+}
+html,body{max-width:100%;overflow-x:hidden}
+body{background:var(--bg);color:var(--ink);font-size:14.5px;line-height:1.62;
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;
+  -webkit-font-smoothing:antialiased}
+button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit}
+button{cursor:pointer;border:none;background:none}
+
+/* ===== 骨架：左导航 + 主区（禁忌②：真适配，不是只居中） ===== */
+.app{display:flex;min-height:100vh;max-width:100%}
+.side{flex:0 0 82px;width:82px;background:linear-gradient(180deg,var(--brand-soft),#FFFFFF 62%);
+  border-right:1px solid var(--line);padding:16px 0;position:fixed;left:0;top:0;bottom:0;
+  overflow-y:auto;z-index:40;
+  display:flex;flex-direction:column;gap:4px;align-items:center}
+.side-sp{flex:0 0 82px}
+.side .logo{width:44px;height:44px;border-radius:13px;display:grid;place-items:center;
+  font-size:21px;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.07);margin-bottom:12px}
+.side button{width:62px;padding:9px 0;border-radius:12px;display:flex;flex-direction:column;
+  align-items:center;gap:3px;color:var(--ink3);font-size:11.5px;font-weight:600;transition:.16s}
+.side button i{font-size:19px;font-style:normal;line-height:1}
+.side button:hover{background:rgba(255,255,255,.72);color:var(--ink2)}
+.side button.on{background:#fff;color:var(--brand);box-shadow:0 2px 9px rgba(0,0,0,.08)}
+.main{flex:1;min-width:0;max-width:100%;padding:22px 26px 64px}
+.wrap{max-width:1120px}
+
+/* ===== Hero 渐变卡 + 计数币种 ===== */
+.hero{background:linear-gradient(118deg,var(--brand-soft) 0%,#FFF0F3 52%,#FFF8EC 100%);
+  border:1px solid var(--line);border-radius:var(--r);padding:19px 22px;margin-bottom:16px}
+.hero h1{font-size:19px;font-weight:800;letter-spacing:.01em}
+.hero .sub{font-size:12.8px;color:var(--ink2);margin-top:5px}
+.chips{display:flex;flex-wrap:wrap;gap:9px;margin-top:14px}
+.chip{background:rgba(255,255,255,.86);border:1px solid rgba(255,255,255,.9);border-radius:11px;
+  padding:7px 13px;display:flex;align-items:center;gap:6px;font-size:13px;font-weight:700;
+  box-shadow:0 1px 5px rgba(0,0,0,.05)}
+.chip span.n{font-size:15.5px;font-weight:800;color:var(--brand)}
+.chip em{font-style:normal;font-size:14px}
+
+/* ===== 卡片（禁忌①：不用灰底切块，白卡+细描边+留白） ===== */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);
+  padding:17px 19px;margin-bottom:15px}
+.ch{display:flex;align-items:center;gap:9px;margin-bottom:13px;flex-wrap:wrap}
+.ch h2{font-size:15px;font-weight:800}
+.ch .q{font-size:12px;color:var(--ink3);font-weight:600;margin-left:auto;white-space:nowrap}
+.ch .ico{width:27px;height:27px;border-radius:9px;display:grid;place-items:center;font-size:15px;
+  background:var(--brand-soft)}
+
+/* 模块量化进度（参照案例的「已学 3/249」写法） */
+.mods{display:grid;grid-template-columns:repeat(auto-fill,minmax(238px,1fr));gap:11px}
+.mod{border:1px solid var(--line);border-radius:13px;padding:13px 14px;transition:.16s;text-align:left;width:100%}
+.mod:hover{border-color:var(--brand);box-shadow:0 3px 12px rgba(0,0,0,.06)}
+.mod .t{display:flex;align-items:center;gap:8px;font-weight:800;font-size:14px}
+.mod .t .b{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;
+  font-size:12.5px;font-weight:800;color:#fff;flex:0 0 26px}
+.mod .d{font-size:12.3px;color:var(--ink2);margin-top:7px;min-height:34px}
+.bar{height:6px;border-radius:4px;background:var(--line2);overflow:hidden;margin-top:9px}
+.bar i{display:block;height:100%;border-radius:4px;background:var(--brand);transition:width .4s}
+.mod .p{font-size:11.5px;color:var(--ink3);font-weight:700;margin-top:6px}
+
+/* 焦点条目 */
+.fi{display:flex;gap:12px;align-items:flex-start;padding:12px 13px;border:1px solid var(--line);
+  border-left:3px solid var(--brand);border-radius:12px;margin-bottom:9px;background:#FFFDFB}
+.fi.urgent{border-left-color:var(--red);background:#FFFBFB}
+.fi .b{flex:1;min-width:0}
+.fi .t{font-weight:700;font-size:14px;word-break:break-word}
+.fi .d{font-size:12.4px;color:var(--ink2);margin-top:3px}
+.fi .d b{color:var(--red)}
+.fi .a{display:flex;gap:6px;flex-wrap:wrap;flex:0 0 auto}
+.empty{text-align:center;padding:26px 14px;color:var(--ink3)}
+.empty .e1{font-size:26px;opacity:.4}
+.empty .e2{font-size:13.5px;font-weight:700;margin-top:7px;color:var(--ink2)}
+.empty .e3{font-size:12.3px;margin-top:3px}
+
+/* 按钮 */
+.btn{border-radius:10px;padding:8px 15px;font-size:13.2px;font-weight:700;transition:.15s;
+  border:1px solid transparent;white-space:nowrap;min-height:36px}
+.btn:active{transform:scale(.97)}
+.b-main{background:var(--brand);color:#fff}
+.b-main:hover{filter:brightness(1.07)}
+.b-ok{background:var(--ok);color:#fff}
+.b-line{background:#fff;border-color:var(--line);color:var(--ink2)}
+.b-line:hover{border-color:var(--ink3)}
+.b-mute{background:#FAF8F5;border-color:var(--line2);color:var(--ink3)}
+.b-del{background:#fff;border-color:var(--line2);color:var(--ink3)}
+.b-del:hover{color:var(--red);border-color:#EBC9C6}
+.b-sm{padding:6px 11px;font-size:12.4px;min-height:32px}
+
+/* 表单 */
+.form{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:10px}
+.fd{display:flex;flex-direction:column;gap:5px}
+.fd label{font-size:11.8px;font-weight:700;color:var(--ink3)}
+.fd input,.fd select,.fd textarea{border:1px solid var(--line);border-radius:10px;padding:9px 11px;
+  background:#fff;font-size:13.5px;min-height:40px;width:100%}
+.fd input:focus,.fd select:focus,.fd textarea:focus{outline:none;border-color:var(--brand)}
+.fa{display:flex;gap:9px;margin-top:12px;flex-wrap:wrap}
+
+/* 表格 → 移动端卡片 */
+.tw{overflow-x:auto;margin:0 -3px}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;font-size:11.6px;font-weight:800;color:var(--ink3);padding:0 9px 9px;
+  border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:11px 9px;border-bottom:1px solid var(--line2);font-size:13.4px;vertical-align:top}
+tr:last-child td{border-bottom:none}
+.tt{font-weight:700;word-break:break-word;line-height:1.45}
+.ts{font-size:12px;color:var(--ink3);margin-top:3px}
+.ta{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end}
+.num{font-variant-numeric:tabular-nums;white-space:nowrap}
+
+.pill{display:inline-block;font-size:11.5px;font-weight:700;padding:2.5px 8px;border-radius:7px;white-space:nowrap}
+.p-ok{background:var(--ok-soft);color:var(--ok)}
+.p-warn{background:var(--warn-soft);color:var(--warn)}
+.p-red{background:var(--red-soft);color:var(--red)}
+.p-brand{background:var(--brand-soft);color:var(--brand)}
+.p-gray{background:#F4F1EC;color:var(--ink3)}
+
+/* KPI */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:11px;margin-bottom:15px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:13px 14px}
+.kpi .l{font-size:11.8px;color:var(--ink3);font-weight:700}
+.kpi .v{font-size:22px;font-weight:800;margin-top:4px;font-variant-numeric:tabular-nums}
+.kpi .s{font-size:11.5px;color:var(--ink3);margin-top:2px}
+
+/* 图表 */
+.cbox{overflow-x:auto;-webkit-overflow-scrolling:touch}
+svg{display:block;max-width:100%;height:auto}
+.lg{display:flex;flex-wrap:wrap;gap:11px;margin-top:10px;font-size:12px;color:var(--ink2)}
+.lg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+
+/* 成就徽章 */
+.meds{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:10px}
+.med{border:1px solid var(--line);border-radius:13px;padding:14px 11px;text-align:center;
+  background:#FCFAF7}
+.med.got{background:linear-gradient(160deg,var(--brand-soft),#FFF7F0);border-color:var(--brand)}
+.med .i{font-size:25px;filter:grayscale(1);opacity:.34}
+.med.got .i{filter:none;opacity:1}
+.med .n{font-size:12.6px;font-weight:800;margin-top:6px}
+.med .c{font-size:11.4px;color:var(--ink3);margin-top:2px}
+
+/* 底部固定主操作（参照案例的「完成打卡，收星星！」） */
+.dock{position:sticky;bottom:0;margin:16px -26px -64px;padding:13px 26px calc(15px + env(safe-area-inset-bottom));
+  background:linear-gradient(180deg,rgba(247,245,241,0),var(--bg) 34%);z-index:30}
+.dock button{width:100%;padding:14px;border-radius:14px;font-size:15px;font-weight:800;
+  background:var(--brand);color:#fff;box-shadow:0 5px 18px rgba(0,0,0,.13)}
+.dock button:active{transform:scale(.985)}
+.dock .hint{text-align:center;font-size:11.8px;color:var(--ink3);margin-top:7px}
+
+/* 提示 / 弹窗 */
+.toast{position:fixed;left:50%;bottom:88px;transform:translateX(-50%);background:#231F1C;color:#fff;
+  padding:10px 18px;border-radius:11px;font-size:13.2px;font-weight:600;z-index:300;
+  opacity:0;pointer-events:none;transition:.24s;max-width:86vw;text-align:center}
+.toast.on{opacity:1;bottom:104px}
+.mask{position:fixed;inset:0;background:rgba(35,31,28,.44);z-index:200;display:none}
+.mask.on{display:block}
+.modal{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);background:#fff;
+  border-radius:17px;padding:22px;width:min(400px,90vw);z-index:210;display:none}
+.modal.on{display:block}
+.modal h3{font-size:16px;font-weight:800}
+.modal p{font-size:13.4px;color:var(--ink2);margin:9px 0 17px}
+.modal .fa{justify-content:flex-end}
+
+.note{background:var(--warn-soft);border:1px solid #F0DFBC;border-radius:12px;padding:12px 14px;
+  display:flex;gap:11px;align-items:center;margin-bottom:15px;font-size:12.8px;color:#6B4E12;flex-wrap:wrap}
+.note b{font-weight:800}
+.note .na{margin-left:auto;display:flex;gap:7px}
+
+.view{display:none}
+.view.on{display:block}
+.ph{margin-bottom:15px}
+.ph h1{font-size:20px;font-weight:800}
+.ph p{font-size:13px;color:var(--ink2);margin-top:4px}
+.mtab{display:none}
+.tags{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px}
+.tags button{border:1px solid var(--line);border-radius:20px;padding:6px 13px;font-size:12.5px;
+  font-weight:700;color:var(--ink2);background:#fff;min-height:34px}
+.tags button.on{background:var(--brand);border-color:var(--brand);color:#fff}
+
+/* ===== 移动端：底部Tab + 表格转卡片 ===== */
+@media (max-width:768px){
+  .app{flex-direction:column}
+  .side{display:none}
+  .side-sp{display:none}
+  .main{padding:15px 13px 92px;max-width:100%}
+  .wrap{max-width:100%}
+  .hero{padding:16px 15px}
+  .hero h1{font-size:17px}
+  .card{padding:15px 14px;border-radius:14px}
+  .chips{gap:7px}
+  .chip{padding:6px 10px;font-size:12.3px}
+  .mods{grid-template-columns:1fr}
+  .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .kpi .v{font-size:19px}
+  .fi{flex-direction:column;gap:9px}
+  .fi .a{width:100%;display:flex;gap:6px;flex-wrap:wrap}
+  .fi .a button{flex:1 1 auto;min-width:calc(50% - 3px)}
+  .form{grid-template-columns:1fr}
+  .fa button{flex:1 1 auto;min-width:118px}
+  .note{flex-direction:column;align-items:flex-start}
+  .note .na{margin-left:0;width:100%}
+  .note .na button{flex:1}
+  table,tbody,tr,td{display:block;width:100%}
+  thead{display:none}
+  tr{background:#fff;border:1px solid var(--line);border-radius:13px;padding:13px;margin-bottom:10px}
+  td{border:none;padding:4px 0;font-size:13.4px}
+  td::before{content:attr(data-l);display:block;font-size:11.2px;color:var(--ink3);font-weight:800;margin-bottom:2px}
+  td.nl::before{display:none}
+  .ta{justify-content:flex-start;margin-top:9px;padding-top:9px;border-top:1px solid var(--line2)}
+  .ta button{flex:1 1 auto;min-width:calc(50% - 3px)}
+  .dock{margin:16px -13px 0;padding:12px 13px calc(13px + env(safe-area-inset-bottom));position:static;background:none}
+  .meds{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .mtab{display:flex;position:fixed;left:0;right:0;bottom:0;background:#fff;
+    border-top:1px solid var(--line);padding:5px 3px calc(5px + env(safe-area-inset-bottom));z-index:150;
+    box-shadow:0 -2px 13px rgba(0,0,0,.05)}
+  .mtab button{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;gap:2px;
+    padding:7px 1px;color:var(--ink3);border-radius:10px;min-height:50px}
+  .mtab button i{font-size:19px;font-style:normal;line-height:1}
+  .mtab button span{font-size:10.5px;font-weight:700;white-space:nowrap;overflow:hidden;
+    text-overflow:ellipsis;max-width:100%}
+  .mtab button.on{color:var(--brand);background:var(--brand-soft)}
+}
+
+/* ===== SKIN OVERRIDE ===== */
+
+body{background:#FFF6F3}
+.main{padding:24px 30px 64px}
+.wrap{max-width:1120px}
+
+/* —— 浅粉导航，柔和不压抑 —— */
+.side{flex:0 0 84px;width:84px;background:linear-gradient(180deg,#FFE9EF,#FFF6F3 70%);border-right:1px solid #FBE0E6}
+.side .logo{background:#fff;color:var(--brand);box-shadow:0 4px 12px rgba(255,111,145,.22);width:48px;height:48px;font-size:23px;border-radius:16px}
+.side button{color:#C99AA6;width:66px;border-radius:15px}
+.side button:hover{background:rgba(255,255,255,.7);color:var(--brand)}
+.side button.on{background:#fff;color:var(--brand);box-shadow:0 4px 14px rgba(255,111,145,.24)}
+.side button i{font-size:20px}
+.side-sp{flex:0 0 84px}
+
+/* —— Hero 柔和珊瑚渐变，圆润，带激励感 —— */
+.hero{background:linear-gradient(125deg,#FF7EA8 0%,#FF6F91 40%,#FF8F6B 100%);
+  border:none;border-radius:26px;padding:26px 28px;box-shadow:0 16px 38px rgba(255,111,145,.42)}
+.hero h1{color:#fff;font-size:25px;font-weight:800;letter-spacing:.02em;text-shadow:0 2px 10px rgba(180,50,90,.35)}
+.hero .sub{color:#fff;margin-top:8px;font-size:13px;font-weight:600;opacity:.96;text-shadow:0 1px 6px rgba(180,50,90,.28)}
+.hero .chip{background:rgba(255,255,255,.24);border:1px solid rgba(255,255,255,.55);color:#fff;
+  border-radius:16px;box-shadow:0 2px 8px rgba(180,50,90,.14);backdrop-filter:blur(3px);text-shadow:0 1px 3px rgba(180,50,90,.25)}
+.hero .chip span.n{color:#fff;text-shadow:0 1px 4px rgba(180,50,90,.3)}
+
+/* —— 内页标题：圆点前缀，柔一点 —— */
+.ph h1{position:relative;padding-left:15px}
+.ph h1::before{content:'';position:absolute;left:0;top:5px;width:9px;height:9px;border-radius:50%;
+  background:linear-gradient(135deg,var(--brand),var(--brand2))}
+
+/* —— 卡片：大圆角 + 柔和粉阴影，奶油感 —— */
+.card{border-radius:20px;border-color:#FBE4E8;box-shadow:0 4px 18px rgba(255,150,170,.08)}
+.ch .ico{background:linear-gradient(135deg,#FFE1E9,#FFF0EC);border-radius:12px}
+.ch h2{letter-spacing:.01em}
+
+/* —— 按钮 / 进度：珊瑚渐变，圆润 —— */
+.btn{border-radius:13px}
+.b-main{background:linear-gradient(135deg,var(--brand),var(--brand2))}
+.bar{background:#FCE7EC}
+.bar i{background:linear-gradient(90deg,var(--brand),var(--brand2))}
+.dock button{background:linear-gradient(135deg,var(--brand),var(--brand2));border-radius:18px;box-shadow:0 8px 22px rgba(255,111,145,.34)}
+.mod{border-radius:16px}
+.mod:hover{border-color:var(--brand);box-shadow:0 5px 16px rgba(255,111,145,.14)}
+.chip{border-radius:14px}
+.pill{border-radius:9px}
+.tags button{border-radius:20px}
+.tags button.on{background:var(--brand);border-color:var(--brand)}
+.fd input,.fd select,.fd textarea{border-radius:12px}
+.fd input:focus,.fd select:focus,.fd textarea:focus{border-color:var(--brand)}
+
+/* —— KPI：粉边圆角 —— */
+.kpi{border-radius:16px;border-color:#FBE4E8}
+.kpi .v{color:#D14B6E}
+
+/* —— 成就徽章：奶油圆润 —— */
+.med{border-radius:16px;background:#FFFaf8;border-color:#FBE4E8}
+.med.got{background:linear-gradient(160deg,#FFE6EC,#FFF4F0);border-color:var(--brand)}
+
+/* —— 焦点条：粉左边 —— */
+.fi{border-radius:15px;background:#FFFBFA}
+
+/* —— 备份提示条：蜜桃色 —— */
+.note{background:#FFF0E9;border-color:#FBD9C9;color:#B5623C}
+.note b{color:#8F4526}
+
+/* —— 移动端底 Tab：白底粉高亮 —— */
+@media(max-width:768px){
+  .main{padding:15px 13px 92px}
+  .hero{border-radius:22px;padding:18px 16px}
+  .card{border-radius:18px}
+  .mtab{background:#fff;border-top:1px solid #FBE0E6;box-shadow:0 -3px 16px rgba(255,150,170,.14)}
+  .mtab button{color:#C99AA6}
+  .mtab button.on{color:#fff;background:linear-gradient(135deg,var(--brand),var(--brand2))}
+}
+/* —— 每日激励条 —— */
+.cheer{display:flex;align-items:center;gap:10px;background:linear-gradient(120deg,#FFF0F4,#FFF6EF);
+  border:1px solid #FBE4E8;border-radius:16px;padding:12px 15px;margin-bottom:15px}
+.cheer .ce{font-size:22px;flex:none}
+.cheer .ct{font-size:13.5px;color:#A65068;font-weight:700;line-height:1.5}
+/* —— 连更里程碑徽章带 —— */
+.milestone{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.ms{flex:1 1 0;min-width:64px;text-align:center;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.42);
+  border-radius:14px;padding:9px 4px;transition:.18s}
+.ms.hit{background:rgba(255,255,255,.95);border-color:#fff;box-shadow:0 4px 12px rgba(180,50,90,.2)}
+.ms .msi{font-size:18px;filter:grayscale(1);opacity:.75}
+.ms.hit .msi{filter:none;opacity:1}
+.ms .msn{font-size:10.5px;color:#fff;font-weight:700;margin-top:3px;text-shadow:0 1px 3px rgba(180,50,90,.35)}
+.ms.hit .msn{color:var(--brand);text-shadow:none}
+</style>
+</head>
+<body>
+<div class="app">
+  <nav class="side">
+    <div class="logo">🌸</div>
+    <button class="on" data-v="home"><i>🏠</i>今日</button><button data-v="topic"><i>💡</i>选题</button><button data-v="script"><i>🎬</i>脚本</button><button data-v="publish"><i>📅</i>发布</button><button data-v="review"><i>📊</i>复盘</button><button data-v="me"><i>🏅</i>我的</button>
+  </nav>
+  <div class="side-sp"></div>
+  <main class="main"><div class="wrap">
+<style>
+/* 每周选题会 / 黄金1小时 步骤条 */
+.steps{display:flex;flex-direction:column;gap:8px}
+.step{display:flex;gap:11px;align-items:flex-start;padding:10px 13px;background:#fff;border:1px solid var(--line);border-radius:12px}
+.step .no{flex:none;width:23px;height:23px;border-radius:50%;background:var(--brand-soft);color:var(--brand);font-weight:800;font-size:12.5px;display:flex;align-items:center;justify-content:center}
+.step .sb{flex:1;min-width:0}
+.step .st{font-weight:700;font-size:13.7px;color:var(--ink);margin-bottom:2px}
+.step .sd{font-size:12.4px;color:var(--ink2);line-height:1.55}
+.step .sd b{color:var(--brand)}
+/* 资产公式卡（钩子/结构/标题/CTA 通用） */
+.fmls{display:grid;grid-template-columns:repeat(2,1fr);gap:11px}
+.fml{background:#fff;border:1px solid var(--line);border-radius:13px;padding:12px 14px;display:flex;flex-direction:column;gap:6px}
+.fml .fh{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.fml .fk{font-weight:800;font-size:13.8px;color:var(--ink)}
+.fml .ft{font-size:11px;color:#fff;background:var(--brand);padding:1px 7px;border-radius:20px;font-weight:700}
+.fml .ff{font-size:12.3px;color:var(--ink2);line-height:1.5}
+.fml .fe{font-size:12.8px;color:var(--ink);background:var(--brand-soft);border-radius:8px;padding:7px 10px;line-height:1.5}
+.fml .fbtn{align-self:flex-start}
+/* 黄金1小时清单 */
+.g1{display:flex;flex-direction:column;gap:8px}
+.g1i{display:flex;gap:10px;align-items:flex-start;padding:9px 12px;background:#fff;border:1px solid var(--line);border-radius:11px}
+.g1i .gd{flex:none;width:7px;height:7px;border-radius:50%;background:var(--brand);margin-top:7px}
+.g1i .gt{font-size:13.3px;color:var(--ink);line-height:1.5}
+.g1i .gt b{color:var(--brand)}
+/* 分发平台小徽章 */
+.dist{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.dchip{font-size:11px;font-weight:700;padding:2px 9px;border-radius:20px;border:1px solid var(--line);color:var(--ink3);cursor:pointer;background:#fff}
+.dchip.on{background:var(--brand-soft);border-color:var(--brand);color:var(--brand)}
+/* 灵感速记小卡 */
+.ideas{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}
+.idea{background:#FFFDFB;border:1px solid var(--line);border-left:3px solid var(--brand);border-radius:11px;padding:11px 13px}
+.idea .it{font-size:13.3px;color:var(--ink);line-height:1.5;word-break:break-word}
+.idea .is{font-size:11.3px;color:var(--ink3);margin-top:6px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.idea .ib{margin-top:8px;display:flex;gap:6px}
+@media(max-width:768px){.fmls{grid-template-columns:1fr}.ideas{grid-template-columns:1fr}}
+/* 每周选题会批量录入 */
+.wmbatch{margin-top:13px;padding:14px;background:var(--brand-soft);border-radius:12px}
+.wmb-hd{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:10px}
+.wmbar{margin-top:12px;display:flex;flex-direction:column;gap:7px}
+.wmbar .mixrow{display:flex;align-items:center;gap:9px;font-size:12.5px}
+.wmbar .mixrow .ml{flex:0 0 44px;font-weight:700;color:var(--ink2)}
+.wmbar .mixrow .mt{flex:1;height:9px;border-radius:5px;background:#fff;overflow:hidden}
+.wmbar .mixrow .mt i{display:block;height:100%;border-radius:5px;transition:width .4s}
+.wmbar .mixrow .mn{flex:0 0 auto;font-weight:700;color:var(--ink3);font-variant-numeric:tabular-nums}
+.wmbar .mixrow .mn.done{color:var(--ok)}
+.wmtip{font-size:12px;color:var(--ink3);margin-top:4px}
+/* 爆款雷达洞察 */
+.radar-ins{display:grid;grid-template-columns:repeat(3,1fr);gap:11px}
+.rins{background:#fff;border:1px solid var(--line);border-radius:14px;padding:13px 14px}
+.rins .rt{font-size:12px;color:var(--ink3);font-weight:700;margin-bottom:8px}
+.rins .rrow{display:flex;align-items:center;gap:7px;margin:5px 0;font-size:12.5px}
+.rins .rrow .rn{flex:0 0 auto;font-weight:700;color:var(--ink2);min-width:52px}
+.rins .rrow .rbar{flex:1;height:8px;border-radius:5px;background:var(--line2);overflow:hidden}
+.rins .rrow .rbar i{display:block;height:100%;border-radius:5px;background:var(--brand)}
+.rins .rrow .rv{flex:0 0 auto;font-size:11.5px;color:var(--ink3);font-weight:700}
+.rins .rword{display:inline-block;background:var(--brand-soft);color:var(--brand);border-radius:20px;
+  padding:3px 11px;font-size:12px;font-weight:700;margin:3px 5px 3px 0}
+.rins-tip{grid-column:1/-1;background:var(--brand-soft);border-radius:13px;padding:11px 14px;
+  font-size:13px;color:var(--ink);line-height:1.55}
+.rins-tip b{color:var(--brand)}
+@media(max-width:768px){.radar-ins{grid-template-columns:1fr}}
+/* AI 直连结果区 */
+.airesult{margin-top:12px;background:#fff;border:1px solid var(--line);border-radius:13px;padding:14px 15px;
+  white-space:pre-wrap;word-break:break-word;font-size:13px;line-height:1.7;color:var(--ink)}
+.airesult.loading{color:var(--ink3);white-space:normal}
+.aikey-tip{font-size:12px;color:var(--ink3);margin-top:8px}
+.aikey-tip a{color:var(--brand);font-weight:700}
+/* AI 指令生成卡 */
+.aibox{background:linear-gradient(135deg,var(--brand-soft),#fff);border:1px solid #D9CFF7;border-radius:13px;padding:15px 16px}
+.aibox .aihd{display:flex;align-items:center;gap:8px;font-weight:800;font-size:14px;color:#3A2585;margin-bottom:4px}
+.aibox .aihd .ai-tag{font-size:10.5px;background:var(--brand);color:#fff;padding:1px 8px;border-radius:20px;font-weight:700}
+.aibox .aidesc{font-size:12.5px;color:var(--ink2);line-height:1.55;margin-bottom:12px}
+/* 指令弹层 */
+.pmask{position:fixed;inset:0;background:rgba(35,31,28,.5);z-index:200;display:none}
+.pmask.on{display:block}
+.pmodal{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);background:#fff;border-radius:18px;
+  width:min(680px,92vw);max-height:86vh;display:none;flex-direction:column;z-index:210;overflow:hidden}
+.pmodal.on{display:flex}
+.pmodal .ph2{padding:18px 20px 12px;border-bottom:1px solid var(--line)}
+.pmodal .ph2 h3{font-size:16px;font-weight:800}
+.pmodal .ph2 p{font-size:12.5px;color:var(--ink2);margin-top:5px;line-height:1.5}
+.pmodal .pbody{padding:14px 20px;overflow-y:auto}
+.pmodal pre{white-space:pre-wrap;word-break:break-word;font-family:inherit;font-size:13px;line-height:1.7;
+  color:var(--ink);background:#F7F5FB;border:1px solid var(--line);border-radius:12px;padding:14px 15px;margin:0}
+.pmodal .pfoot{padding:13px 20px calc(15px + env(safe-area-inset-bottom));border-top:1px solid var(--line);
+  display:flex;gap:9px;flex-wrap:wrap}
+.pmodal .psteps{font-size:12px;color:var(--ink3);margin-top:10px;line-height:1.6}
+</style>
+
+<!-- ============ 今日 ============ -->
+<section class="view on" data-v="home">
+  <div class="hero">
+    <h1 data-i18n="自媒体运营工作台">自媒体运营工作台</h1>
+    <div class="sub" id="h-sub"></div>
+    <div class="chips" id="h-chips"></div>
+    <div class="milestone" id="h-ms"></div>
+  </div>
+
+  <div class="cheer" id="cheer"><span class="ce">🌷</span><span class="ct" id="cheer-t"></span></div>
+
+  <div class="card">
+    <div class="ch"><div class="ico">⚡</div><h2 data-i18n="灵感速记">灵感速记</h2><span class="q" data-i18n="刷到好点子随手存，别让它飞走">刷到好点子随手存，别让它飞走</span></div>
+    <div class="form" style="grid-template-columns:1fr 150px auto; margin-bottom:11px">
+      <div class="fd"><label data-i18n="一句话记下来">一句话记下来</label><input data-i18n-ph="比如：拍一条「新人接单被压价怎么办」" id="qi-t" onkeydown="if(event.key==='Enter')quickIdea()" placeholder="比如：拍一条「新人接单被压价怎么办」"></div>
+      <div class="fd"><label data-i18n="来源（选填）">来源（选填）</label><input data-i18n-ph="谁的哪条/哪来的" id="qi-s" placeholder="谁的哪条/哪来的"></div>
+      <div class="fd"><label>&nbsp;</label><button class="btn b-main" data-i18n="存进灵感池" onclick="quickIdea()">存进灵感池</button></div>
+    </div>
+    <div id="qi-recent"></div>
+  </div>
+
+  <div class="card">
+    <div class="ch"><div class="ico">📌</div><h2 data-i18n="今天要做的">今天要做的</h2><span class="q" id="f-q"></span></div>
+    <div class="form" style="grid-template-columns:1fr 150px auto; margin-bottom:13px">
+      <div class="fd"><label data-i18n="自己加一件事">自己加一件事</label>
+        <input data-i18n-ph="比如：给上周爆的那条补个第二集" id="td-t" onkeydown="if(event.key==='Enter')addTodo()" placeholder="比如：给上周爆的那条补个第二集"></div>
+      <div class="fd"><label data-i18n="什么时候做">什么时候做</label><input id="td-d" type="date"></div>
+      <div class="fd"><label>&nbsp;</label><button class="btn b-main" data-i18n="加进来" onclick="addTodo()">加进来</button></div>
+    </div>
+    <div id="f-list"></div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:10px">
+      <button class="btn b-sm b-mute" id="btn-restore" onclick="restoreHidden()" style="display:none"></button>
+      <button class="btn b-sm b-mute" id="btn-clean" onclick="cleanDone()" style="display:none"></button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ch"><div class="ico">🚀</div><h2 data-i18n="各板块进度">各板块进度</h2><span class="q" data-i18n="点一下进对应板块">点一下进对应板块</span></div>
+    <div class="mods" id="mods"></div>
+  </div>
+
+  <div class="dock">
+    <button data-i18n="今天更新了 ⭐ 打卡" onclick="checkIn()">今天更新了 ⭐ 打卡</button>
+    <div class="hint" id="dock-hint"></div>
+  </div>
+</section>
+
+<!-- ============ 选题 ============ -->
+<section class="view" data-v="topic">
+  <div class="ph"><h1 data-i18n="选题">选题</h1><p data-i18n="内容的源头。每周固定开选题会，分四类库囤够弹药，每条都能一句话说清。">内容的源头。每周固定开选题会，分四类库囤够弹药，每条都能一句话说清。</p></div>
+
+  <div class="card">
+    <div class="ch"><div class="ico">🗓️</div><h2 data-i18n="每周选题会">每周选题会</h2><span class="q" id="wm-q"></span></div>
+    <p data-i18n="爆款不是灵光一现，是每周坐下来选出来的。跟着走一遍，本周 7 条选题就有了。" style="color:var(--ink2); font-size:13px; margin:-4px 0 12px">爆款不是灵光一现，是每周坐下来选出来的。跟着走一遍，本周 7 条选题就有了。</p>
+    <div class="steps" id="wm-steps"></div>
+
+    <div class="wmbatch">
+      <div class="wmb-hd" data-i18n="📝 把想到的选题填进来 · 大纲/发布日选填，之后能补">📝 把想到的选题填进来 · 大纲/发布日选填，之后能补</div>
+      <div class="form">
+        <div class="fd" style="grid-column:1/-1"><label data-i18n="选题标题">选题标题</label><input data-i18n-ph="一句话把这条选题写下来" id="t-t" onkeydown="if(event.key==='Enter')saveTopic()" placeholder="一句话把这条选题写下来"></div>
+        <div class="fd" style="grid-column:1/-1"><label><span data-i18n="一句话大纲">一句话大纲</span> <span data-i18n="· 说不清=废选题，可先空着" style="color:var(--ink3); font-weight:400">· 说不清=废选题，可先空着</span></label><input data-i18n-ph="比如：用我接单亏 8000 的经历，讲新人报价 3 个坑" id="t-out" placeholder="比如：用我接单亏 8000 的经历，讲新人报价 3 个坑"></div>
+        <div class="fd"><label data-i18n="选题库">选题库</label><select id="t-lv"><option data-i18n="🔥 爆款（重点打）" value="爆款">🔥 爆款（重点打）</option><option data-i18n="📌 日常（稳更新）" value="日常">📌 日常（稳更新）</option><option data-i18n="📚 系列（养 IP）" value="系列">📚 系列（养 IP）</option><option data-i18n="🧪 测试（试水）" value="测试">🧪 测试（试水）</option></select></div>
+        <div class="fd"><label data-i18n="形态">形态</label><select id="t-fmt"><option data-i18n="视频" value="视频">视频</option><option data-i18n="图文" value="图文">图文</option></select></div>
+        <div class="fd"><label data-i18n="计划发布（选填）">计划发布（选填）</label><input id="t-d" type="date"></div>
+        <div class="fd"><label data-i18n="要准备的素材（选填）">要准备的素材（选填）</label><input data-i18n-ph="比如：报价单截图、对账记录" id="t-m" placeholder="比如：报价单截图、对账记录"></div>
+      </div>
+      <div class="fa" style="margin-top:11px"><button class="btn b-main" data-i18n="加进本周选题库" onclick="saveTopic()">加进本周选题库</button>
+      <button class="btn b-line" data-i18n="清空" onclick="clearForm(['t-t','t-out','t-m'])">清空</button></div>
+      <div class="wmbar" id="wm-mix"></div>
+    </div>
+
+    <div class="fa" style="margin-top:12px">
+      <button class="btn b-main" data-i18n="本周选题会开完了 ✓" id="wm-btn" onclick="doWeekMeet()">本周选题会开完了 ✓</button>
+      <button class="btn b-line" data-i18n="撤销本周打卡" id="wm-undo" onclick="undoWeekMeet()" style="display:none">撤销本周打卡</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ch"><div class="ico">📚</div><h2 data-i18n="选题库">选题库</h2><span class="q" id="tl-q"></span></div>
+    <div class="tags" id="t-tags"></div>
+    <div class="tw"><table><thead><tr><th data-i18n="选题">选题</th><th data-i18n="选题库">选题库</th><th data-i18n="形态">形态</th><th data-i18n="计划">计划</th><th></th></tr></thead><tbody id="tl-body"></tbody></table></div>
+  </div>
+
+  <div class="card">
+    <div class="ch"><div class="ico">💡</div><h2 data-i18n="灵感池">灵感池</h2><span class="q" id="ip-q"></span></div>
+    <p data-i18n="刷到的碎点子先囤这，想清楚了「转成选题」进库。" style="color:var(--ink3); font-size:12.5px; margin:-4px 0 11px">刷到的碎点子先囤这，想清楚了「转成选题」进库。</p>
+    <div class="ideas" id="ip-list"></div>
+  </div>
+
+  <div class="card">
+    <div class="ch"><div class="ico">📡</div><h2 data-i18n="爆款雷达">爆款雷达</h2><span class="q" data-i18n="刷到就存，攒成你的选题情报库">刷到就存，攒成你的选题情报库</span></div>
+    <p data-i18n="看到同赛道的爆款别光点赞——存进来。攒多了自动帮你看出：哪类钩子最火、哪个平台机会多、大家都在聊什么。" style="color:var(--ink2); font-size:12.5px; margin:-4px 0 12px">看到同赛道的爆款别光点赞——存进来。攒多了自动帮你看出：哪类钩子最火、哪个平台机会多、大家都在聊什么。</p>
+
+    <div class="radar-ins" id="radar-ins"></div>
+
+    <div class="aibox" style="margin:14px 0">
+      <div class="aihd">🤖 <span data-i18n="AI 帮我拆这条">AI 帮我拆这条</span> <span class="ai-tag" data-i18n="AI 提效">AI 提效</span></div>
+      <div class="aidesc" data-i18n="粘上爆款文案，AI 逐维度拆给你听：钩子、结构、为什么火、你能借什么。">粘上爆款文案，AI 逐维度拆给你听：钩子、结构、为什么火、你能借什么。</div>
+      <div class="form">
+        <div class="fd" style="grid-column:1/-1"><label data-i18n="粘贴爆款文案（标题 + 开头/正文，越全越准）">粘贴爆款文案（标题 + 开头/正文，越全越准）</label><textarea data-i18n-ph="把对标爆款的标题和正文原样粘进来" id="ai-rf-src" placeholder="把对标爆款的标题和正文原样粘进来" rows="3"></textarea></div>
+        <div class="fd"><label data-i18n="形态">形态</label><select id="ai-rf-fmt"><option data-i18n="视频/口播" value="视频">视频/口播</option><option data-i18n="图文/笔记" value="图文">图文/笔记</option></select></div>
+        <div class="fd"><label data-i18n="你的赛道（选填）">你的赛道（选填）</label><input data-i18n-ph="比如：副业接单 / 职场成长" id="ai-rf-niche" placeholder="比如：副业接单 / 职场成长"></div>
+      </div>
+      <div class="fa" id="ai-rf-btns"></div>
+      <div id="ai-rf-out"></div>
+    </div>
+
+    <div data-i18n="收一条爆款进雷达：" style="color:var(--ink3); font-size:12.5px; font-weight:700; margin-bottom:9px">收一条爆款进雷达：</div>
+    <div class="form">
+      <div class="fd" style="grid-column:1/-1"><label data-i18n="爆款标题 / 链接">爆款标题 / 链接</label><input data-i18n-ph="谁的哪条爆款" id="rf-t" placeholder="谁的哪条爆款"></div>
+      <div class="fd"><label data-i18n="平台">平台</label><select id="rf-plat"><option data-i18n="小红书">小红书</option><option data-i18n="抖音">抖音</option><option data-i18n="视频号">视频号</option><option data-i18n="公众号">公众号</option><option data-i18n="B站">B站</option><option data-i18n="其他">其他</option></select></div>
+      <div class="fd"><label data-i18n="钩子类型">钩子类型</label><select id="rf-hk"><option data-i18n="不确定" value>不确定</option><option data-i18n="具体数字">具体数字</option><option data-i18n="痛点扎心">痛点扎心</option><option data-i18n="反差反常识">反差反常识</option><option data-i18n="结果前置">结果前置</option><option data-i18n="身份代入">身份代入</option><option data-i18n="悬念提问">悬念提问</option><option data-i18n="自曝亏损">自曝亏损</option></select></div>
+      <div class="fd"><label data-i18n="热度量级">热度量级</label><select id="rf-heat"><option data-i18n="未知" value>未知</option><option data-i18n="10w+ 现象级">10w+ 现象级</option><option data-i18n="1w-10w 爆款">1w-10w 爆款</option><option data-i18n="千赞 小爆">千赞 小爆</option></select></div>
+      <div class="fd"><label data-i18n="赛道/话题">赛道/话题</label><input data-i18n-ph="比如：副业接单、报价" id="rf-niche" placeholder="比如：副业接单、报价"></div>
+      <div class="fd" style="grid-column:1/-1"><label data-i18n="为什么火 / 我能借什么">为什么火 / 我能借什么</label><input data-i18n-ph="一句话总结可复用的点" id="rf-why" placeholder="一句话总结可复用的点"></div>
+    </div>
+    <div class="fa"><button class="btn b-main" data-i18n="收进雷达" onclick="saveRef()">收进雷达</button>
+    <button class="btn b-line" data-i18n="清空" onclick="clearForm(['rf-t','rf-niche','rf-why'])">清空</button></div>
+    <div class="tw" style="margin-top:8px"><table><thead><tr><th data-i18n="爆款">爆款</th><th data-i18n="平台/钩子">平台/钩子</th><th data-i18n="热度">热度</th><th></th></tr></thead><tbody id="rf-body"></tbody></table></div>
+  </div>
+</section>
+
+<!-- ============ 脚本 ============ -->
+<section class="view" data-v="script">
+  <div class="ph"><h1 data-i18n="脚本">脚本</h1><p data-i18n="写稿不用从零起。钩子/结构/标题/CTA 都是可套用的资产，越攒越快。">写稿不用从零起。钩子/结构/标题/CTA 都是可套用的资产，越攒越快。</p></div>
+
+  <div class="card">
+    <div class="ch"><div class="ico">⚡</div><h2 data-i18n="黄金 3 秒开头公式">黄金 3 秒开头公式</h2><span class="q" data-i18n="套模板，改成自己的">套模板，改成自己的</span></div>
+    <div class="fmls" id="hook-fmls"></div>
+  </div>
+
+  <div class="card">
+    <div class="ch"><div class="ico">🧱</div><h2 data-i18n="爆款结构模板">爆款结构模板</h2><span class="q" data-i18n="图文/视频通用套路" id="tpl-q">图文/视频通用套路</span></div>
+    <div class="tags" id="tpl-tags"></div>
+    <div class="fmls" id="tpl-fmls"></div>
+  </div>
+
+  <div class="card">
+    <div class="ch"><div class="ico">🪄</div><h2 data-i18n="AI 脚本生成器">AI 脚本生成器</h2><span class="q" data-i18n="把上面的钩子+结构+你的选题，拼成写脚本指令">把上面的钩子+结构+你的选题，拼成写脚本指令</span></div>
+    <div class="aibox">
+      <div class="aihd">🤖 <span data-i18n="帮我写这条的脚本">帮我写这条的脚本</span> <span class="ai-tag" data-i18n="AI 提效">AI 提效</span></div>
+      <div class="aidesc" data-i18n="前面的钩子公式、结构模板不是摆着看的——选一选、填个选题，一键生成「写脚本指令」，AI 就能按你选的套路产出初稿，你再改。">前面的钩子公式、结构模板不是摆着看的——选一选、填个选题，一键生成「写脚本指令」，AI 就能按你选的套路产出初稿，你再改。</div>
+      <div class="form">
+        <div class="fd" style="grid-column:1/-1"><label><span data-i18n="选一条选题">选一条选题</span> <span data-i18n="· 或直接手写主题" style="color:var(--ink3); font-weight:400">· 或直接手写主题</span></label>
+          <select id="sg-topic" onchange="sgPickTopic()"><option data-i18n="— 手写主题 —" value>— 手写主题 —</option></select></div>
+        <div class="fd" style="grid-column:1/-1"><label data-i18n="主题 / 想讲什么">主题 / 想讲什么</label><input data-i18n-ph="比如：新人接单被压价，怎么体面地涨价" id="sg-theme" placeholder="比如：新人接单被压价，怎么体面地涨价"></div>
+        <div class="fd"><label data-i18n="形态">形态</label><select id="sg-fmt" onchange="refreshStructOpts()"><option data-i18n="视频/口播" value="视频">视频/口播</option><option data-i18n="图文/笔记" value="图文">图文/笔记</option></select></div>
+        <div class="fd"><label data-i18n="平台">平台</label><select id="sg-plat"><option data-i18n="小红书">小红书</option><option data-i18n="抖音">抖音</option><option data-i18n="视频号">视频号</option><option data-i18n="公众号">公众号</option><option data-i18n="B站">B站</option></select></div>
+        <div class="fd"><label data-i18n="开头钩子">开头钩子</label><select id="sg-hook"></select></div>
+        <div class="fd"><label data-i18n="内容结构">内容结构</label><select id="sg-struct"></select></div>
+        <div class="fd" style="grid-column:1/-1"><label data-i18n="必须包含的要点 / 你的真实经历（选填，越具体越好）">必须包含的要点 / 你的真实经历（选填，越具体越好）</label><input data-i18n-ph="比如：我接单亏 8000 的经历、报价从 800 涨到 3000" id="sg-points" placeholder="比如：我接单亏 8000 的经历、报价从 800 涨到 3000"></div>
+      </div>
+      <div class="fa" id="sg-btns"></div>
+      <div id="sg-out"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="ch"><div class="ico">✏️</div><h2 data-i18n="存一条我的资产">存一条我的资产</h2><span class="q" data-i18n="攒下自己验证过好用的开头/标题/结尾">攒下自己验证过好用的开头/标题/结尾</span></div>
+    <div class="form">
+      <div class="fd" style="grid-column:1/-1"><label data-i18n="内容原文">内容原文</label><textarea data-i18n-ph="把管用的开头/标题/结尾原样抄下来" id="as-t" placeholder="把管用的开头/标题/结尾原样抄下来" rows="2"></textarea></div>
+      <div class="fd"><label data-i18n="类型">类型</label><select id="as-k"><option data-i18n="开头钩子">开头钩子</option><option data-i18n="标题公式">标题公式</option><option data-i18n="结尾CTA">结尾CTA</option><option data-i18n="结构套路">结构套路</option></select></div>
+      <div class="fd"><label data-i18n="来源">来源</label><input data-i18n-ph="自己哪条/谁的" id="as-s" placeholder="自己哪条/谁的"></div>
+      <div class="fd"><label data-i18n="效果（1-5）">效果（1-5）</label><select id="as-r"><option data-i18n="5 很灵" value="5">5 很灵</option><option data-i18n="4 不错" value="4">4 不错</option><option data-i18n="3 一般" selected value="3">3 一般</option><option data-i18n="2 偏弱" value="2">2 偏弱</option><option data-i18n="1 没用" value="1">1 没用</option></select></div>
+    </div>
+    <div class="fa"><button class="btn b-main" data-i18n="存进库" onclick="saveAsset()">存进库</button>
+    <button class="btn b-line" data-i18n="清空" onclick="clearForm(['as-t','as-s'])">清空</button></div>
+  </div>
+
+  <div class="card">
+    <div class="ch"><div class="ico">🗂️</div><h2 data-i18n="我的资产库">我的资产库</h2><span class="q" id="as-q"></span></div>
+    <div class="fd" style="margin-bottom:11px"><input data-i18n-ph="搜关键词…" id="as-search" oninput="renderAssets()" placeholder="搜关键词…"></div>
+    <div class="tags" id="as-tags"></div>
+    <div class="tw"><table><thead><tr><th data-i18n="原文">原文</th><th data-i18n="类型">类型</th><th data-i18n="效果">效果</th><th></th></tr></thead><tbody id="as-body"></tbody></table></div>
+  </div>
+</section>
+
+<!-- ============ 发布 ============ -->
+<section class="view" data-v="publish">
+  <div class="ph"><h1 data-i18n="发布">发布</h1><p data-i18n="选题排进日程、挑对时段、发完盯住黄金 1 小时——别发完就撒手。">选题排进日程、挑对时段、发完盯住黄金 1 小时——别发完就撒手。</p></div>
+
+  <div class="card">
+    <div class="ch"><div class="ico">⏰</div><h2 data-i18n="各平台最佳发布时段">各平台最佳发布时段</h2><span class="q" data-i18n="经验值，最终以你自己复盘为准">经验值，最终以你自己复盘为准</span></div>
+    <div id="slot-ref"></div>
+  </div>
+
+  <div class="card">
+    <div class="ch"><div class="ico">📅</div><h2 data-i18n="发布排期">发布排期</h2><span class="q" id="pl-q"></span></div>
+    <p data-i18n="选题一旦定了发布日就会出现在这。逾期/卡住会在「今天」提醒你。" style="color:var(--ink3); font-size:12.5px; margin:-4px 0 11px">选题一旦定了发布日就会出现在这。逾期/卡住会在「今天」提醒你。</p>
+    <div class="tags" id="p-tags"></div>
+    <div class="tw"><table><thead><tr><th data-i18n="内容">内容</th><th data-i18n="形态">形态</th><th data-i18n="计划发布">计划发布</th><th data-i18n="状态">状态</th><th></th></tr></thead><tbody id="pl-body"></tbody></table></div>
+  </div>
+
+  <div class="card">
+    <div class="ch"><div class="ico">⚡</div><h2 data-i18n="发布后黄金 1 小时">发布后黄金 1 小时</h2><span class="q" data-i18n="刚发完照着做">刚发完照着做</span></div>
+    <p data-i18n="发完及时查看真实反馈、回复评论，并记录需要调整的地方。" style="color:var(--ink2); font-size:13px; margin:-4px 0 11px">发完及时查看真实反馈、回复评论，并记录需要调整的地方。</p>
+    <div class="g1" id="g1list"></div>
+    <div class="fa" style="margin-top:11px">
+      <button class="btn b-line" data-i18n="这条的黄金 1 小时我盯完了 ✓" id="g1-btn" onclick="doGolden()">这条的黄金 1 小时我盯完了 ✓</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 复盘 ============ -->
+<section class="view" data-v="review">
+  <div class="ph"><h1 data-i18n="复盘">复盘</h1><p data-i18n="只跟自己的历史比。四率看清哪条行、时段/钩子/选题库归因看清为什么行。">只跟自己的历史比。四率看清哪条行、时段/钩子/选题库归因看清为什么行。</p></div>
+
+  <div class="kpis" id="rv-kpi"></div>
+
+  <div class="card">
+    <div class="ch"><div class="ico">📝</div><h2 data-i18n="记一条已发内容的数据">记一条已发内容的数据</h2></div>
+    <div class="form">
+      <div class="fd" style="grid-column:1/-1"><label><span data-i18n="选已发布的内容">选已发布的内容</span> <span data-i18n="· 或直接新记一条" style="color:var(--ink3); font-weight:400">· 或直接新记一条</span></label>
+        <select id="rv-pick" onchange="pickPosted()"><option data-i18n="— 新记一条 —" value>— 新记一条 —</option></select></div>
+      <div class="fd"><label data-i18n="标题">标题</label><input data-i18n-ph="发出去的标题" id="r-t" placeholder="发出去的标题"></div>
+      <div class="fd"><label data-i18n="平台">平台</label><select id="r-pl" onchange="toggleFmtFields()"><option data-i18n="小红书">小红书</option><option data-i18n="抖音">抖音</option><option data-i18n="视频号">视频号</option><option data-i18n="公众号">公众号</option><option data-i18n="B站">B站</option><option data-i18n="其他">其他</option></select></div>
+      <div class="fd"><label data-i18n="形态">形态</label><select id="r-fmt" onchange="toggleFmtFields()"><option data-i18n="视频" value="视频">视频</option><option data-i18n="图文" value="图文">图文</option></select></div>
+      <div class="fd"><label data-i18n="发布时段">发布时段</label><select id="r-slot"><option data-i18n="未记" value>未记</option><option data-i18n="早 7-9">早 7-9</option><option data-i18n="午 12-14">午 12-14</option><option data-i18n="下午 15-18">下午 15-18</option><option data-i18n="晚 18-20">晚 18-20</option><option data-i18n="晚 20-23">晚 20-23</option><option data-i18n="深夜/凌晨">深夜/凌晨</option></select></div>
+      <div class="fd"><label data-i18n="钩子类型">钩子类型</label><select id="r-hk"><option data-i18n="具体数字">具体数字</option><option data-i18n="痛点扎心">痛点扎心</option><option data-i18n="反差反常识">反差反常识</option><option data-i18n="结果前置">结果前置</option><option data-i18n="身份代入">身份代入</option><option data-i18n="悬念提问">悬念提问</option><option data-i18n="自曝亏损">自曝亏损</option><option data-i18n="其他">其他</option></select></div>
+      <div class="fd"><label data-i18n="曝光/播放">曝光/播放</label><input id="r-v" min="0" placeholder="0" type="number"></div>
+      <div class="fd" id="fd-wr"><label data-i18n="完播率 %（视频）">完播率 %（视频）</label><input id="r-wr" max="100" min="0" placeholder="0" step="0.1" type="number"></div>
+      <div class="fd"><label data-i18n="点赞">点赞</label><input id="r-l" min="0" placeholder="0" type="number"></div>
+      <div class="fd"><label data-i18n="收藏">收藏</label><input id="r-c" min="0" placeholder="0" type="number"></div>
+      <div class="fd"><label data-i18n="评论">评论</label><input id="r-m" min="0" placeholder="0" type="number"></div>
+      <div class="fd"><label data-i18n="涨粉">涨粉</label><input id="r-f" min="0" placeholder="0" type="number"></div>
+      <div class="fd" style="grid-column:1/-1"><label data-i18n="复盘笔记（选填）">复盘笔记（选填）</label><input data-i18n-ph="这条为什么成/为什么不成" id="r-n" placeholder="这条为什么成/为什么不成"></div>
+    </div>
+    <div class="fa"><button class="btn b-main" data-i18n="存下数据" onclick="saveData()">存下数据</button>
+    <button class="btn b-line" data-i18n="清空" onclick="resetDataForm()">清空</button></div>
+  </div>
+
+  <div class="card">
+    <div class="ch"><div class="ico">📈</div><h2 data-i18n="曝光 × 涨粉走势">曝光 × 涨粉走势</h2><span class="q" data-i18n="最近 8 条">最近 8 条</span></div>
+    <div class="cbox" id="c-line"></div>
+    <div class="lg"><span><i style="background:var(--brand)"></i><span data-i18n="曝光（左轴）">曝光（左轴）</span></span><span><i style="background:#2E7D52"></i><span data-i18n="涨粉（右轴）">涨粉（右轴）</span></span><span><i style="background:#8B5CB8"></i><span data-i18n="曝光均值">曝光均值</span></span></div>
+  </div>
+
+  <div class="card">
+    <div class="ch"><div class="ico">🔬</div><h2 data-i18n="归因：什么在带来曝光">归因：什么在带来曝光</h2><span class="q" data-i18n="按平均曝光" id="attr-q">按平均曝光</span></div>
+    <div class="tags" id="attr-tags"></div>
+    <div class="cbox" id="c-attr"></div>
+  </div>
+
+  <div class="card">
+    <div class="ch"><div class="ico">📋</div><h2 data-i18n="全部内容">全部内容</h2><span class="q" id="al-q"></span></div>
+    <div class="tags" id="a-tags"></div>
+    <div class="tw"><table><thead><tr><th data-i18n="标题">标题</th><th class="num" data-i18n="曝光">曝光</th><th class="num" data-i18n="互动率">互动率</th><th class="num" data-i18n="涨粉">涨粉</th><th data-i18n="判定">判定</th><th></th></tr></thead><tbody id="al-body"></tbody></table></div>
+  </div>
+</section>
+
+<!-- ============ 我的 ============ -->
+<section class="view" data-v="me">
+  <div class="ph"><h1 data-i18n="我的成就">我的成就</h1><p data-i18n="坚持是能看见的；本地版数据保存在当前浏览器。">坚持是能看见的；本地版数据保存在当前浏览器。</p></div>
+  <div class="card">
+    <div class="ch"><div class="ico">🏅</div><h2 data-i18n="成就">成就</h2><span class="q" id="md-q"></span></div>
+    <div class="meds" id="meds"></div>
+  </div>
+  <div class="kpis" id="me-kpi"></div>
+
+  <div class="card">
+    <div class="ch"><div class="ico">💾</div><h2 data-i18n="数据说明">数据说明</h2></div>
+    <p data-i18n="本地版使用当前浏览器的 localStorage 自动保存。换设备前请导出 JSON 备份；在线同步请按仓库教程在 WorkBuddy 资料库重新搭建。" style="color:var(--ink2); font-size:13px; margin-bottom:13px">本地版使用当前浏览器的 localStorage 自动保存。换设备前请导出 JSON 备份；在线同步请按仓库教程在 WorkBuddy 资料库重新搭建。</p>
+    <div class="fa">
+      <button class="btn b-main" onclick="exportJSON()">导出 JSON 备份</button>
+      <button class="btn b-line" onclick="document.getElementById('backup-file').click()">导入 JSON 备份</button>
+      <button class="btn b-line" onclick="exportCSV()">导出内容 CSV</button>
+      <input id="backup-file" type="file" accept=".json,application/json" style="display:none" onchange="importJSON(this)">
+      <button class="btn b-del" data-i18n="清空示例内容" onclick="clearDemo()">清空示例内容</button>
+      <button class="btn b-del" data-i18n="全部重置" onclick="resetAll()">全部重置</button>
+    </div>
+    <p data-i18n="手机上想当 App 用：Safari 点分享 → 添加到主屏幕；安卓 Chrome 点右上菜单 → 添加到主屏幕。" style="color:var(--ink3); font-size:12.3px; margin-top:13px">手机上想当 App 用：Safari 点分享 → 添加到主屏幕；安卓 Chrome 点右上菜单 → 添加到主屏幕。</p>
+  </div>
+</section>
+
+<!-- ============ AI 指令弹层（复用） ============ -->
+<div class="pmask" id="pmask" onclick="closePrompt()"></div>
+<div class="pmodal" id="pmodal">
+  <div class="ph2"><h3 data-i18n="AI 指令" id="pm-title">AI 指令</h3><p id="pm-desc"></p></div>
+  <div class="pbody"><pre id="pm-text"></pre>
+    <div class="psteps" data-i18n="用法：① 复制下面这段 → ② 打开你常用的 AI 助手粘贴发送 → ③ 把 AI 给的结果填回工作台对应地方。">用法：① 复制下面这段 → ② 打开你常用的 AI 助手粘贴发送 → ③ 把 AI 给的结果填回工作台对应地方。</div>
+  </div>
+  <div class="pfoot">
+    <button class="btn b-main" data-i18n="复制指令" onclick="copyPrompt()">复制指令</button>
+    <button class="btn b-line" data-i18n="关闭" onclick="closePrompt()">关闭</button>
+  </div>
+</div>
+<!-- ============ 发布编辑弹层 ============ -->
+<div class="pmask" id="epmask" onclick="closeEditPub()"></div>
+<div class="pmodal" id="epmodal">
+  <div class="ph2"><h3 data-i18n="编辑这条排期">编辑这条排期</h3><p id="ep-title"></p></div>
+  <div class="pbody">
+    <div class="form">
+      <div class="fd"><label data-i18n="形态">形态</label><select id="ep-fmt"><option data-i18n="视频" value="视频">视频</option><option data-i18n="图文" value="图文">图文</option></select></div>
+      <div class="fd"><label data-i18n="状态">状态</label><select id="ep-stage"><option data-i18n="待写">待写</option><option data-i18n="在写">在写</option><option data-i18n="待发">待发</option><option data-i18n="已发">已发</option></select></div>
+      <div class="fd"><label data-i18n="计划/发布日期">计划/发布日期</label><input id="ep-date" type="date"></div>
+      <div class="fd"><label data-i18n="平台">平台</label><select id="ep-plat"><option data-i18n="未定" value>未定</option><option data-i18n="小红书">小红书</option><option data-i18n="抖音">抖音</option><option data-i18n="视频号">视频号</option><option data-i18n="公众号">公众号</option><option data-i18n="B站">B站</option><option data-i18n="其他">其他</option></select></div>
+      <div class="fd" style="grid-column:1/-1"><label data-i18n="发布时段">发布时段</label><select id="ep-slot"><option data-i18n="未定" value>未定</option><option data-i18n="早 7-9">早 7-9</option><option data-i18n="午 12-14">午 12-14</option><option data-i18n="下午 15-18">下午 15-18</option><option data-i18n="晚 18-20">晚 18-20</option><option data-i18n="晚 20-23">晚 20-23</option><option data-i18n="深夜/凌晨">深夜/凌晨</option></select></div>
+    </div>
+  </div>
+  <div class="pfoot">
+    <button class="btn b-main" data-i18n="保存" onclick="savePub()">保存</button>
+    <button class="btn b-line" data-i18n="取消" onclick="closeEditPub()">取消</button>
+  </div>
+</div>
+</div></main>
+</div>
+<div class="mtab"><button class="on" data-v="home"><i>🏠</i><span>今日</span></button><button data-v="topic"><i>💡</i><span>选题</span></button><button data-v="script"><i>🎬</i><span>脚本</span></button><button data-v="publish"><i>📅</i><span>发布</span></button><button data-v="review"><i>📊</i><span>复盘</span></button><button data-v="me"><i>🏅</i><span>我的</span></button></div>
+<div class="toast" id="toast"></div>
+<div class="mask" id="mask"></div>
+<div class="modal" id="modal">
+  <h3 id="mk-t">确认</h3><p id="mk-d"></p>
+  <div class="fa"><button class="btn b-line" id="mk-no">再想想</button><button class="btn b-main" id="mk-ok">确定</button></div>
+</div>
+<script>
+/* ---------- 存储：本地自动保存，关页面不丢 ---------- */
+const KEY='workbench_offline_v1';
+let DB;
+function today(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function shift(n){const d=new Date();d.setDate(d.getDate()+n);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function dayDiff(a,b){if(!a||!b)return 0;return Math.round((new Date(b+'T00:00:00')-new Date(a+'T00:00:00'))/86400000);}
+function fmtDate(s){if(!s)return '-';const p=s.split('-');return p.length===3?(+p[1])+'月'+(+p[2])+'日':s;}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7);}
+function num(n){return (+n||0).toLocaleString('zh-CN');}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function save(){
+  try{ localStorage.setItem(KEY, JSON.stringify(DB)); }
+  catch(e){ toast('本地存储已满，请清理部分旧记录'); }
+}
+function load(){
+  try{
+    const raw=localStorage.getItem(KEY);
+    if(!raw) return null;
+    const d=JSON.parse(raw);
+    return (d && typeof d==='object') ? d : null;
+  }catch(e){ toast('本地数据读取失败，已用示例内容打开（原数据未删除）'); return null; }
+}
+/* ---------- 轻交互：提示 / 确认 ---------- */
+let _tt;
+function toast(m){
+  const t=document.getElementById('toast'); t.textContent=m; t.classList.add('on');
+  clearTimeout(_tt); _tt=setTimeout(()=>t.classList.remove('on'),2100);
+}
+let _cb=null;
+function confirmBox(title,desc,fn){
+  document.getElementById('mk-t').textContent=title;
+  document.getElementById('mk-d').textContent=desc;
+  _cb=fn;
+  document.getElementById('mask').classList.add('on');
+  document.getElementById('modal').classList.add('on');
+}
+function closeBox(){
+  document.getElementById('mask').classList.remove('on');
+  document.getElementById('modal').classList.remove('on');
+  _cb=null;
+}
+function go(v){
+  document.querySelectorAll('.view').forEach(x=>x.classList.toggle('on',x.dataset.v===v));
+  document.querySelectorAll('.side button[data-v],.mtab button[data-v]').forEach(b=>b.classList.toggle('on',b.dataset.v===v));
+  window.scrollTo(0,0);
+}
+
+/* ================= i18n：源头双语（?lang=en 切英文，缺省中文） ================= */
+/* 机制：所有界面可见中文在源头包 t()；静态 HTML 用 data-i18n 标注。不做运行时 DOM 遍历替换。 */
+const LANG=(function(){try{return new URL(location.href).searchParams.get('lang')==='en'?'en':'zh';}catch(e){return 'zh';}})();
+const T={
+  /* —— 导航 —— */
+  '今日':'Today','选题':'Topics','脚本':'Scripts','发布':'Publish','复盘':'Review','我的':'Me',
+  /* —— 通用弹窗/确认 —— */
+  '确认':'Confirm','再想想':'Not now','确定':'Confirm',
+  /* —— 应用名 / Hero —— */
+  '自媒体运营工作台':'Media Studio Workbench','我的成就':'My Achievements',
+  /* —— 今日页 —— */
+  '灵感速记':'Quick Ideas','刷到好点子随手存，别让它飞走':"Capture ideas on the fly — don't let them slip away",
+  '一句话记下来':'Jot it in one line','来源（选填）':'Source (optional)','存进灵感池':'Save idea',
+  '今天要做的':"Today's To-dos",'自己加一件事':'Add a to-do','什么时候做':'When','加进来':'Add',
+  '各板块进度':'Section Progress','点一下进对应板块':'Tap to open a section',
+  '今天更新了 ⭐ 打卡':'Posted today ⭐ Check in',
+  /* seed 提示语 / 激励语 */
+  '今天也要把想法变成作品呀～':'Turn ideas into work today too~',
+  '慢慢来，稳定更新的人最后都赢了 💪':'Take it slow — consistent posters win in the end 💪',
+  '你收集的每条灵感，都会变成下一个爆款 ✨':'Every idea you save becomes the next hit ✨',
+  '别怕数据不好，复盘一下就是进步 🌱':"Don't fear weak numbers — a review is progress 🌱",
+  '坚持发，平台迟早会看见你 🌟':"Keep posting; the platform will notice you 🌟",
+  '今天的一条内容，是未来粉丝认识你的入口 💗':"Today's post is how future fans find you 💗",
+  /* —— 里程碑 —— */
+  '起步':'Start','3天':'3 days','一周':'1 week','两周':'2 weeks','月更':'Monthly','百天':'100 days',
+  /* —— chips —— */
+  '连更':'Streak','爆款待发':'Viral queued','灵感池':'Ideas','已发':'Posted',
+  /* —— 选题页 —— */
+  '内容的源头。每周固定开选题会，分四类库囤够弹药，每条都能一句话说清。':'The source of content. Hold a weekly topic meeting, stock four libraries, and sum up each in one line.',
+  '每周选题会':'Weekly Topic Meeting',
+  '爆款不是灵光一现，是每周坐下来选出来的。跟着走一遍，本周 7 条选题就有了。':"Hits aren't flukes — they come from a weekly sit-down. Follow the steps and you'll have 7 topics for the week.",
+  '📝 把想到的选题填进来 · 大纲/发布日选填，之后能补':'📝 Add the topics you think of · outline/date optional, fill later',
+  '选题标题':'Topic title','一句话把这条选题写下来':'Write this topic in one line',
+  '一句话大纲':'One-line outline','· 说不清=废选题，可先空着':"· can't explain it = dead topic; leave blank for now",
+  '选题库':'Library','形态':'Format','计划发布（选填）':'Planned date (optional)',
+  '要准备的素材（选填）':'Assets to prep (optional)',
+  '🔥 爆款（重点打）':'🔥 Viral (main focus)','📌 日常（稳更新）':'📌 Routine (steady)',
+  '📚 系列（养 IP）':'📚 Series (build IP)','🧪 测试（试水）':'🧪 Test (experiment)',
+  '视频':'Video','图文':'Text',
+  '比如：用我接单亏 8000 的经历，讲新人报价 3 个坑':'e.g. use my 8000 loss to cover 3 pricing pitfalls',
+  '比如：报价单截图、对账记录':'e.g. quote screenshot, reconciliation log',
+  '加进本周选题库':'Add to this week','清空':'Clear',
+  '本周选题会开完了 ✓':'Weekly meeting done ✓','撤销本周打卡':'Undo this week',
+  '刷到就存，攒成你的选题情报库':'Save what you spot; build your topic intel base',
+  '刷到的碎点子先囤这，想清楚了「转成选题」进库。':'Stash raw ideas here; when clear, convert to a topic.',
+  '爆款雷达':'Viral Radar',
+  '看到同赛道的爆款别光点赞——存进来。攒多了自动帮你看出：哪类钩子最火、哪个平台机会多、大家都在聊什么。':'See a hit in your niche? Save it, don\'t just like it. Collect enough and it auto-reveals: which hooks are hottest, which platforms have room, and what everyone\'s talking about.',
+  '🤖 AI 帮我拆这条':'🤖 Let AI break this down','AI 提效':'AI boost',
+  '粘上爆款文案，AI 逐维度拆给你听：钩子、结构、为什么火、你能借什么。':"Paste a hit's text; AI breaks it down dimension by dimension: hook, structure, why it went viral, what you can borrow.",
+  '粘贴爆款文案（标题 + 开头/正文，越全越准）':'Paste the hit (title + opening/body, the fuller the better)',
+  '把对标爆款的标题和正文原样粘进来':"Paste the benchmark hit's title and body as-is",
+  '视频/口播':'Video / voiceover','图文/笔记':'Text / note',
+  '你的赛道（选填）':'Your niche (optional)','比如：副业接单 / 职场成长':'e.g. side-gig / career growth',
+  '收一条爆款进雷达：':'Add a hit to the radar:',
+  '爆款标题 / 链接':'Hit title / link','谁的哪条爆款':'Whose viral post',
+  '平台':'Platform','钩子类型':'Hook type','不确定':'Not sure',
+  '热度量级':'Heat level','未知':'Unknown',
+  '赛道/话题':'Niche / topic','比如：副业接单、报价':'e.g. side gigs, pricing',
+  '为什么火 / 我能借什么':'Why it went viral / what I can borrow','一句话总结可复用的点':'Sum up the reusable point in one line',
+  '收进雷达':'Add to radar',
+  /* —— 脚本页 —— */
+  '写稿不用从零起。钩子/结构/标题/CTA 都是可套用的资产，越攒越快。':"Never write from scratch. Hooks / structures / titles / CTAs are reusable assets — the more you save, the faster you go.",
+  '黄金 3 秒开头公式':'Golden 3-Second Opening Formulas','套模板，改成自己的':'Use a template, make it yours',
+  '爆款结构模板':'Viral Structure Templates','图文/视频通用套路':'Patterns for text & video',
+  'AI 脚本生成器':'AI Script Generator',
+  '把上面的钩子+结构+你的选题，拼成写脚本指令':'Combine the hooks + structures above with your topic into a scriptwriting prompt',
+  '🤖 帮我写这条的脚本':'🤖 Write this script for me',
+  '前面的钩子公式、结构模板不是摆着看的——选一选、填个选题，一键生成「写脚本指令」，AI 就能按你选的套路产出初稿，你再改。':"The hook formulas and structure templates above aren't just for show — pick a few, add a topic, and generate a scriptwriting prompt in one click. AI drafts by your chosen pattern; you refine.",
+  '选一条选题':'Pick a topic','· 或直接手写主题':'· or type a theme',
+  '主题 / 想讲什么':'Theme / what to cover','比如：新人接单被压价，怎么体面地涨价':'e.g. how newbies handle lowball offers and raise prices gracefully',
+  '开头钩子':'Opening hook','内容结构':'Structure',
+  '必须包含的要点 / 你的真实经历（选填，越具体越好）':'Must-include points / your real experience (optional, the more specific the better)',
+  '比如：我接单亏 8000 的经历、报价从 800 涨到 3000':'e.g. lost 8000 on a gig, raised price 800→3000',
+  '存一条我的资产':'Save an asset of mine','攒下自己验证过好用的开头/标题/结尾':'Save openings/titles/endings you\'ve proven work',
+  '内容原文':'Original text','把管用的开头/标题/结尾原样抄下来':'Copy a proven opening / title / ending as-is',
+  '类型':'Type','来源':'Source','自己哪条/谁的':'Which of mine / whose',
+  '效果（1-5）':'Rating (1-5)','5 很灵':'5 great','4 不错':'4 good','3 一般':'3 ok','2 偏弱':'2 weak','1 没用':'1 useless',
+  '存进库':'Save','我的资产库':'My Asset Library','搜关键词…':'Search keywords…',
+  /* —— 发布页 —— */
+  '选题排进日程、挑对时段、发完盯住黄金 1 小时——别发完就撒手。':"Schedule topics, pick the right time slot, and watch the golden first hour after posting — don't just walk away.",
+  '各平台最佳发布时段':'Best Time by Platform','经验值，最终以你自己复盘为准':'Rules of thumb; trust your own review',
+  '发布排期':'Publishing Schedule',
+  '选题一旦定了发布日就会出现在这。逾期/卡住会在「今天」提醒你。':"Once a topic gets a date it shows up here. Overdue/stuck items get flagged on the Today page.",
+  '内容':'Content','计划发布':'Planned date','状态':'Status',
+  '发布后黄金 1 小时':'Golden First Hour After Posting','刚发完照着做':'Do this right after posting',
+  '发完及时查看真实反馈、回复评论，并记录需要调整的地方。':"After posting, review genuine feedback, reply to comments, and note what to improve.",
+  '这条的黄金 1 小时我盯完了 ✓':'Watched this golden hour ✓',
+  /* —— 复盘页 —— */
+  '只跟自己的历史比。四率看清哪条行、时段/钩子/选题库归因看清为什么行。':'Compare only to your own history. The four rates show which post worked; time/hook/library attribution shows why.',
+  '记一条已发内容的数据':'Log data for a published post',
+  '选已发布的内容':'Pick a published post','· 或直接新记一条':'· or add a new one',
+  '标题':'Title','发出去的标题':'The title you posted',
+  '发布时段':'Time slot','未记':'N/A',
+  '曝光/播放':'Reach/Plays','完播率 %（视频）':'Completion % (video)',
+  '点赞':'Likes','收藏':'Saves','评论':'Comments','涨粉':'New fans',
+  '复盘笔记（选填）':'Review note (optional)','这条为什么成/为什么不成':"Why it worked / didn't",
+  '存下数据':'Save data',
+  '曝光 × 涨粉走势':'Reach × Followers Trend','最近 8 条':'Last 8',
+  '曝光（左轴）':'Reach (left)','涨粉（右轴）':'Followers (right)','曝光均值':'Reach avg',
+  '归因：什么在带来曝光':'Attribution: what drives reach','按平均曝光':'By avg reach',
+  '全部内容':'All Content','曝光':'Reach','互动率':'Engagement','判定':'Verdict',
+  /* —— 我的页 —— */
+  '坚持是能看见的；本地版数据保存在当前浏览器。':'Consistency shows; this edition saves data in your current browser.',
+  '成就':'Achievements','数据说明':'Data Info',
+  '本地版使用当前浏览器的 localStorage 自动保存。换设备前请导出 JSON 备份；在线同步请按仓库教程在 WorkBuddy 资料库重新搭建。':'This standalone edition saves data in localStorage. Export a JSON backup before changing devices. Follow the repository guide for an online WorkBuddy version.',
+  '清空示例内容':'Clear sample data','全部重置':'Reset all',
+  '手机上想当 App 用：Safari 点分享 → 添加到主屏幕；安卓 Chrome 点右上菜单 → 添加到主屏幕。':'Use it as an app: on Safari tap Share → Add to Home Screen; on Android Chrome tap menu → Add to Home Screen.',
+  /* —— 指令弹层 —— */
+  'AI 指令':'AI Prompt',
+  '用法：① 复制下面这段 → ② 打开你常用的 AI 助手粘贴发送 → ③ 把 AI 给的结果填回工作台对应地方。':"How to use: 1) Copy the text below 2) Paste it into your favorite AI assistant 3) Fill the AI's result back into the workbench.",
+  '复制指令':'Copy prompt','关闭':'Close',
+  '编辑这条排期':'Edit this schedule','计划/发布日期':'Planned / publish date','未定':'TBD',
+  '保存':'Save','取消':'Cancel',
+  /* —— select 选项：平台 —— */
+  '小红书':'RED','抖音':'Douyin','视频号':'Channels','公众号':'WeChat','B站':'Bilibili','其他':'Other',
+  /* —— 钩子类型 —— */
+  '具体数字':'Specific numbers','痛点扎心':'Pain point','反差反常识':'Counterintuitive',
+  '结果前置':'Result first','身份代入':'Persona','悬念提问':'Cliffhanger','自曝亏损':'Self-exposed loss',
+  /* —— 热度量级 —— */
+  '10w+ 现象级':'100k+ phenomenal','1w-10w 爆款':'10k-100k hit','千赞 小爆':'1k+ small hit',
+  /* —— 时段 —— */
+  '早 7-9':'Morning 7-9','午 12-14':'Noon 12-14','下午 15-18':'Afternoon 15-18',
+  '晚 18-20':'Evening 18-20','晚 20-23':'Night 20-23','深夜/凌晨':'Late night',
+  /* —— 选题库分类 —— */
+  '爆款':'Viral','日常':'Routine','系列':'Series','测试':'Test',
+  /* —— 阶段 —— */
+  '待写':'To write','在写':'Writing','待发':'To post','已发':'Posted','全部':'All',
+  /* —— 资产类型 —— */
+  '开头钩子':'Opening hook','标题公式':'Title formula','结尾CTA':'Ending CTA','结构套路':'Structure pattern',
+  /* —— 表头 / 表格 label —— */
+  '选题':'Topic','计划':'Plan','平台/钩子':'Platform/Hook','热度':'Heat','原文':'Text','爆款':'Viral',
+  /* —— 归因维度 —— */
+  '按选题库':'By library','按钩子':'By hook','按时段':'By time','按形态':'By format','按平台':'By platform',
+  /* —— 四率 KPI —— */
+  '关注率':'Follow rate','完播率':'Completion %','曝光基准':'Reach baseline',
+  '赞+藏+评 / 曝光':'(Likes+Saves+Comments) / Reach','涨粉 / 曝光':'New fans / Reach',
+  '视频类均值':'Video avg','你自己的平均线':'your own average',
+  /* —— me KPI —— */
+  '内容总数':'Total posts','脚本资产':'Script assets','连续更新':'Streak',
+  '条':' items','天':' days',
+  /* —— 步骤条 WEEK_STEPS —— */
+  '回看上周数据':"Review last week's data",
+  '翻一眼「复盘」的归因，哪类选题库/钩子真的带来曝光——这周往它加码。':'Check the Review attribution: which library/hook actually drove reach — double down on it this week.',
+  '扒热点 + 评论区':'Mine trends + comments',
+  '看平台热榜、同行爆款；翻自己评论区，粉丝反复问的就是现成选题。':"Scan hot lists and peers' hits; browse your comments — what fans keep asking is a ready-made topic.",
+  '定 7 条选题':'Set 7 topics',
+  '<b>3 爆款 + 3 日常 + 1 测试</b>，别贪多，够一周更新就行。':"<b>3 viral + 3 routine + 1 test</b> — don't overdo it, enough for a week's posting.",
+  '每条写一句话大纲':'Write a one-line outline for each',
+  '先把标题敲进下面的框囤着，之后在选题库补大纲想透再发。':'Type the titles into the box below to stock them; flesh out outlines in the library later.',
+  /* —— 配比 —— */
+  '本周已囤':'Stocked this week ','条 · 建议配比 3 爆款 + 3 日常 + 1 测试':' · suggested mix: 3 viral + 3 routine + 1 test',
+  '✓ 本周弹药够了，去选题库补大纲、排发布日':'✓ Enough for this week — flesh out outlines and set dates in the library',
+  '再囤':'Stock ','条就够一周更新':' more for a full week',
+  '本周已开 ✓ 干得漂亮':'Held this week ✓ Nicely done',
+  '本周已开 · 囤':'Held · stocked ','进行中 · ':'In progress · ','待开':'Pending',
+  /* —— 钩子公式 HOOK_FMLS —— */
+  '量化冲击':'Quantified impact',
+  '开头砸一个具体、反差大的数字，越离谱越留人。':'Open with a specific, jarring number — the more absurd, the stickier.',
+  '我副业第一个月只赚 240 块，第 6 个月做到 2 万——只改对了这 3 件事。':'My first side-gig month earned just 240; by month 6 it was 20k — I only fixed these 3 things.',
+  '先说你的难':'Name their pain first',
+  '第一句直接戳中对方正卡着的事，让 TA 觉得"说的就是我"。':'First line hits exactly what they\'re stuck on, so they think "that\'s me".',
+  '接单最崩溃的不是活多，是改到第 8 稿还被说"没感觉"。':'The worst part of freelancing isn\'t the workload — it\'s hearing "not feeling it" on draft 8.',
+  '打破预期':'Break expectations',
+  '先抛一个和大家默认认知相反的结论，制造"啊？"的停顿。':'Drop a conclusion opposite to common belief to trigger a "huh?" pause.',
+  '别急着做私域。粉丝多不等于能变现，我踩过这个坑。':"Don't rush into private traffic. More fans ≠ more money — I fell into that trap.",
+  '先给答案':'Answer first',
+  '把最爽的结果摆最前，再倒回去讲怎么做到。':'Put the best result up front, then backtrack to how you did it.',
+  '先说结论：这方法我用了 3 个月，涨粉 2000，没投一分钱。':'Bottom line: I used this for 3 months, gained 2000 fans, spent zero.',
+  '精准喊人':'Call out precisely',
+  '开头点名目标人群，让对的人一秒对号入座。':'Name your target audience up front so the right people identify instantly.',
+  '如果你也是上班族、想搞副业又怕耽误正职，这条看完。':"If you're a 9-to-5er wanting a side gig without hurting your job, watch this.",
+  '留个钩子':'Leave a hook',
+  '抛一个对方很想知道答案、但你偏不马上说的问题。':"Pose a question they badly want answered, but don't reveal it right away.",
+  '为什么同样的活，有人报 800 有人报 3000？差的不是技术。':"Why does the same gig get quoted 800 by some and 3000 by others? It's not skill.",
+  /* —— 结构模板 TPLS —— */
+  '痛点解决型':'Pain-solving','最稳的万能结构':'Safest all-round structure',
+  '痛点开场→我踩的坑→3个方法→结果对比→引导关注':'Pain hook → my mistakes → 3 methods → result comparison → CTA to follow',
+  '适合教程/避坑类，完播和收藏都稳。':'Great for tutorials/pitfall guides; steady completion and saves.',
+  '故事反转型':'Story twist','适合涨粉':'Good for gaining fans',
+  '反常识开场→铺垫→反转→揭示原因→观点升华':'Counterintuitive hook → setup → twist → reveal cause → elevate the point',
+  '情绪拉满，评论区容易吵起来带互动。':'High emotion; comments heat up and drive engagement.',
+  '清单盘点型':'Listicle','易保存':'Easy to save',
+  '一句话承诺 N 个干货→逐条快节奏给→结尾催收藏':'Promise N tips in one line → deliver fast, one by one → push saves at the end',
+  '信息密度高，收藏率高但涨粉一般。':'High info density; high save rate but modest follower growth.',
+  '干货清单型':'Tips listicle','小红书最爱':'RED favorite',
+  '标题给数字承诺→首图放重点→正文分点→结尾引导收藏':'Number promise in title → key point on cover → bulleted body → CTA to save',
+  '封面标题决定 80% 打开率，务必打磨。':'The cover title drives 80% of opens — polish it.',
+  '个人故事型':'Personal story','涨粉利器':'A follower magnet',
+  '自曝经历开场→真实过程→转折→总结方法→留互动钩子':'Self-revealing hook → real process → turning point → method summary → engagement hook',
+  '真实感强，容易被"自己人"关注。':'Highly authentic; draws "one of us" followers.',
+  '对比测评型':'Comparison review','高信任':'High trust',
+  '纠结点开场→维度对比表→我的选择→适合谁':'Open on the dilemma → dimension comparison table → my choice → who it suits',
+  '决策类内容，转化到私域强。':'Decision-oriented; strong conversion to private traffic.',
+  /* —— select 前缀（脚本生成器） —— */
+  '— 手写主题 —':'— Type a theme —','AI 帮我挑最合适的':'Let AI pick the best fit',
+  '我的钩子：':'My hook: ',
+  /* —— 复盘 select —— */
+  '— 新记一条 —':'— New entry —','（已录）':' (logged)','（待录）':' (to log)',
+  /* —— 时段参考 SLOTS —— */
+  '早 7-9 通勤 · 午 12-14 · 晚 18-22（黄金）':'Morning 7-9 commute · Noon 12-14 · Evening 18-22 (prime)',
+  '早 9-10 · 午休 12-13 · 晚 19-23（最强）':'Morning 9-10 · Lunch 12-13 · Evening 19-23 (strongest)',
+  '早 7-8 · 晚 20-22（中老年活跃）':'Morning 7-8 · Evening 20-22 (older users active)',
+  '早 7-9 通勤 · 晚 20-22 睡前':'Morning 7-9 commute · Evening 20-22 bedtime',
+  '午 12-13 · 晚 19-23 · 周末全天':'Noon 12-13 · Evening 19-23 · weekends all day',
+  /* —— 黄金1小时 GOLDEN —— */
+  '发布后检查页面和链接是否正常，及时回复真实评论':'Check that the post and link work, then reply to genuine comments',
+  '把内容<b>转到私域群/朋友圈</b>，第一波流量往里导':'<b>Share to your private groups/Moments</b> to funnel the first wave of traffic',
+  '<b>盯评论区</b>：15 分钟内回复每一条，评论越多越推':'<b>Watch the comments</b>: reply to each within 15 min — more comments, more push',
+  '主动在评论区<b>留一个引导互动的问题</b>（如"你踩过哪个坑？"）':'<b>Leave an engagement question</b> in the comments (e.g. "which pitfall did you hit?")',
+  '首波数据不对就<b>改标题/封面</b>（图文可改，抓住黄金窗口）':'If the first numbers are off, <b>edit the title/cover</b> (text posts allow it — seize the golden window)',
+  /* —— 成就徽章 medals —— */
+  '开张':'Opened shop','记第一条选题':'Log your first topic',
+  '开过选题会':'Held a meeting','完成一次每周选题会':'Complete one weekly topic meeting',
+  '库存充足':'Well stocked','选题库囤满 8 条待发':'Stock 8 pending topics',
+  '资产收藏家':'Asset collector','脚本资产存满 10 条':'Save 10 script assets',
+  '盯过黄金1小时':'Golden-hour watcher','完成 3 次发布后黄金1小时':'Watch 3 golden hours after posting',
+  '有基准了':'Baseline set','记满 5 条已发数据':'Log data for 5 published posts',
+  '出过爆款':'Made a hit','有内容超均值 1.5 倍':'A post exceeds 1.5× your average',
+  '连更 7 天':'7-day streak','连续更新打卡 7 天':'Check in 7 days in a row',
+  /* —— toast 文案 —— */
+  '写一句再存':'Write something first','存进灵感池了 💡':'Saved to ideas 💡','已删除':'Deleted',
+  '已转成选题，去补大纲和发布日 👉':'Converted to a topic — add outline and date 👉',
+  '写一句话再加':'Write a line first','加好了':'Added',
+  '干得漂亮 👍':'Nicely done 👍','这条不再提醒了':"Won't remind about this anymore",
+  '都找回来了':'All restored','清好了':'Cleared',
+  '已标为已发，记得去复盘记数据':'Marked posted — remember to log data in Review',
+  '今天已经打过卡了，明天继续 ✨':"Already checked in today; keep going tomorrow ✨",
+  '本周选题会已经开过啦':"You've already held this week's meeting",
+  '本周选题会打卡 🎉 弹药充足':'Meeting checked in 🎉 fully stocked',
+  '本周选题会打卡 🗓️ 记得补齐到 7 条':'Meeting checked in 🗓️ remember to reach 7 topics',
+  '已撤销本周打卡，可以重新开':"Undone — you can hold it again",
+  '先写个标题':'Write a title first','加进本周选题库 ✓ 可以接着录下一条':'Added to this week ✓ log the next one',
+  '状态改成「':'Status changed to "','」了':'"',
+  '收进雷达了 📡':'Added to radar 📡',
+  '已按这条爆款起了个选题，去补大纲 ✏️':'Started a topic from this hit — add the outline ✏️',
+  '先把爆款文案粘进来':'Paste the hit text first','先填爆款标题':'Fill the hit title first',
+  '把内容抄进来':'Copy the content in','存进资产库了':'Saved to assets',
+  '示例已复制并填入下方，改成你自己的再存库':'Example copied and filled below — tweak it, then save',
+  '复制好了，去粘贴吧':'Copied — go paste it','复制失败，长按选中手动复制':'Copy failed — long-press to select and copy manually',
+  '先选一条选题或写个主题':'Pick a topic or type a theme first',
+  '这条排期改好了':'Schedule updated',
+  '标题总得写一个':'A title is required','数据存好了，判定已自动算出':'Data saved; verdict auto-computed',
+  '已经没有示例内容了':'No sample data left','清好了，这下全是你自己的':"Cleared — it's all yours now",
+  '已重置':'Reset done',
+  '打卡成功！连续':'Checked in! Streak: ','天 ⭐':' days ⭐',
+  '今天已经盯完啦':"Already watched today",
+  '黄金 1 小时打卡 ⚡ 稳住这个习惯':'Golden hour checked in ⚡ keep the habit',
+  '顺延到':'Postponed to ',
+  /* —— confirmBox 文案 —— */
+  '删掉这条待办？':'Delete this to-do?','删了就没了。':' — gone for good once deleted.',
+  '清掉已完成的待办？':'Clear finished to-dos?','会删掉':'Will delete ','条做完的。':' finished items.',
+  '删掉这条内容？':'Delete this post?','删了，相关统计会跟着变。':' — related stats will change.',
+  '清空示例内容？':'Clear sample data?','条自带示例，你自己填的都留着。':' built-in samples; your own entries stay.',
+  '确定全部重置？':'Reset everything?','所有内容都会删掉且无法恢复。':'Everything will be deleted irreversibly.',
+  /* —— 动态拼接短语 / 单位 —— */
+  ' 件':' items',' 条':' posts',' 天':' d',
+  '库里 ':'In library ',' 条待发 · 灵感池 ':' pending · Ideas ',' 条':' ',
+  '在库 ':'Active ','把管用的开头/标题存起来':'Save proven openings/titles',
+  '已存 ':'Saved ',' 条可复用资产':' reusable assets',
+  '今天待发 ':'Due today ',' · 逾期 ':' · Overdue ',
+  '记几条数据就能归因':'Log a few posts to enable attribution',
+  '最能打的':'Top: ','记几条数据就能归因':'Log a few to attribute',
+  '已得 ':'Earned ',' 枚徽章':' badges','坚持连更就能解锁':'Keep your streak to unlock',
+  '选题':'Topics','脚本资产':'Script assets','发布':'Publish','复盘':'Review','成就':'Achievements',
+  '题':'T','本':'A','发':'P','盘':'R','章':'M',
+  '今天已打卡，连续 ':'Checked in today, streak ',' 天':' d',
+  '每周更满 5 天，解锁「稳定输出」':'Post 5×/week to unlock "Steady Output"',
+  '连续更新 ':'Streak ',' 天 · 本周打卡 ':' d · this week ',
+  '都清完了':'All clear',
+  '灵感池空的，刷到好点子随手记一条':'Ideas empty — jot one down when inspiration strikes',
+  '我加的':'Mine','做完了':'Done','删掉':'Delete',
+  '没有拖着的事，节奏很稳':'Nothing lagging — nice steady pace',
+  '去选题库挑一条爆款开写':'Pick a viral topic and start writing',
+  '恢复已收起 ':'Restore hidden ','清理已完成 ':'Clear done ',
+  /* —— focusItems 拼接 —— */
+  '说好 ':'Due ',' 做，已过 <b>':', overdue by <b>','</b> 天':'</b> d',
+  '排在 ':'Set for ','没定时间':'No date',
+  '计划 ':'Planned ',' 发，已拖 <b>':', overdue <b>','</b> 天（现在「':'</b> d (now "','」）':'")',
+  '今天就该发了，现在还是「':'Due today, still "',
+  '标为已发':'Mark posted','顺延一周':'Postpone 1wk','不提醒':'Dismiss','去发布板块':'Go to Publish',
+  '有 ':'There are ',' 条已发内容还没记数据':' published posts without data',
+  '去复盘板块补上曝光/涨粉，趋势才准':'Log reach/fans in Review for accurate trends',
+  '去记数据':'Log data','去复盘':'Go to Review',
+  '爆款选题空了':'No viral topics left','开个每周选题会，或去归因看看哪类最能打':'Hold a topic meeting, or check attribution for what performs',
+  '去选题':'Go to Topics',
+  /* —— 选题列表 拼接 —— */
+  '大纲：':'Outline: ','素材：':'Assets: ',
+  '逾期 ':'Overdue ','这个库还没有选题':'No topics in this library',
+  '上面加一条，或开个每周选题会':'Add one above, or hold a topic meeting',
+  '来源：':'Source: ',
+  '灵感池空的':'Ideas is empty','去「今日」页随手记，或刷到就来存':'Jot on the Today page, or save when you spot one',
+  /* —— 爆款雷达洞察 —— */
+  '📡 多收几条同赛道爆款（≥2 条），这里就会自动帮你看出：':'📡 Collect a few more hits in your niche (≥2) and this auto-reveals: ',
+  '哪类钩子最火、哪个平台机会多、大家都在聊什么':'which hooks are hottest, which platforms have room, and what everyone\'s talking about',
+  '。':'.',
+  '🪝 最火的钩子类型':'🪝 Hottest hook types','收几条时标上钩子':'Tag hooks as you collect',
+  '📱 爆款集中的平台':'📱 Platforms with the most hits',
+  '🔥 高频赛道词':'🔥 Frequent niche words','收几条标上赛道':'Tag niches as you collect',
+  '💡 看出来了：你收集的爆款里，':'💡 Spotted: among the hits you collected, ',
+  ' 类钩子出现最多（':' hooks appear most (','条）':' ',
+  '、集中在 ':', concentrated on ',
+  '。下次选题、写钩子，优先往这个方向靠 —— 点某条爆款的「仿一条」直接生成选题。':'. Next time, lean this way for topics and hooks — tap "Clone one" on a hit to generate a topic.',
+  '收几条时标上钩子':'Tag hooks when collecting',
+  /* —— 雷达列表 —— */
+  '赛道：':'Niche: ','可借：':'Borrow: ','雷达还是空的':'The radar is empty',
+  '刷到同赛道爆款，收一条进来':'Spot a niche hit? Add one',
+  '仿一条':'Clone one','删':'Del',
+  '仿：':'Clone: ','参考：':'Ref: ',
+  /* —— 资产库列表 —— */
+  '复制':'Copy','没有匹配的资产':'No matching assets','换个筛选，或上面存一条':'Change the filter, or save one above',
+  /* —— 发布列表 —— */
+  '记数据':'Log data','编辑':'Edit','标已发':'Mark posted',
+  '这个状态下没有内容':'No posts in this status','去选题库加一条并排上发布日':'Add one in the library and set a date',
+  /* —— 复盘 全部内容 —— */
+  '笔记：':'Note: ','完播 ':'Completion ',
+  '待观察':'Watching','爆了 +':'Viral +','达标 +':'On target +','及格':'Pass','低于预期 -':'Underperforming -',
+  '改':'Edit','还没有已发内容的数据':'No data on published posts yet','上面选一条已发内容记数据':'Pick a published post above to log data',
+  /* —— 图表 —— */
+  '记满 2 条数据才能出走势':'Log 2 posts to draw a trend',
+  '左轴：曝光':'Left: Reach','右轴：涨粉':'Right: Followers',
+  '记几条已发数据才能归因':'Log a few published posts to attribute','去上面记一条':'Log one above',
+  '平均 ':'Avg ',
+  /* —— tpl 复制 —— */
+  '例：':'e.g. ','用这个 · 复制示例':'Use this · copy example','复制结构':'Copy structure',
+  /* —— seed 示例数据（会显示，需翻译） —— */
+  '我副业亏了 8000 块，这 3 个坑别再踩':"I lost 8000 on my side gig — avoid these 3 traps",
+  '用亲身亏损经历讲新人接单3个坑':'Use my real loss to cover 3 newbie pitfalls',
+  '开头直接报数字，完播高':'Opens with a number, high completion',
+  '接了个 3000 的活，改了 8 稿':'Took a 3000 gig, revised 8 times',
+  '算时薪劝新人先谈清改稿次数':'Compute hourly rate; agree on revisions upfront',
+  '我劝你别急着做私域':"Don't rush into private traffic",
+  '反常识：先把内容做扎实':'Counterintuitive: nail the content first',
+  '争议大评论多但涨粉一般':'Controversial, many comments, modest follower gain',
+  '做了半年副业，我把报价涨了 3 倍':'6 months of side gigs, I tripled my rates',
+  '对比前后报价单讲提价动作':'Compare before/after quotes to explain the raise',
+  '上班族做副业，我的一天怎么排':'A 9-to-5er doing side gigs: how I plan my day',
+  '身份代入，展示时间表':'Persona hook, show the schedule',
+  '太日常缺信息量':'Too routine, low info',
+  '粉丝多不等于能变现':'More fans doesn\'t mean more money',
+  '反常识讲变现逻辑':'Counterintuitive take on monetization',
+  '副业第一个月只赚了 240 块':'My first side-gig month earned just 240',
+  '自曝真实收入拉近距离':'Reveal real income to build rapport',
+  '自曝亏损最灵':'Self-exposed loss works best',
+  '5 个我天天在用的 AI 工具':'5 AI tools I use every day',
+  '工具合集':'Tool roundup',
+  '工具合集已饱和':'Tool roundups are saturated',
+  '副业半年真实收入明细（附对账表）':'6-month side income breakdown (with ledger)',
+  '用半年流水讲普通人副业能赚多少':'Use 6-month records to show what a side gig earns',
+  '接单对账表截图':'Gig ledger screenshot',
+  '报价从 800 涨到 3000 我改了什么':'What I changed to raise quotes 800→3000',
+  '对比报价单讲提价3动作':'Compare quotes to explain 3 pricing moves',
+  '前后报价单对比':'Before/after quote comparison',
+  '花 2000 报的课值不值':'Was the 2000 course worth it?',
+  '客观评测这类课适合谁':'Objectively review who such courses suit',
+  '付款记录+课程目录':'Payment record + course syllabus',
+  '副业接单被拖款我怎么防':'How I guard against late payment on gigs',
+  '系列副业防坑第3集':'Side-gig pitfalls series, part 3',
+  '催款话术截图':'Payment-chasing scripts screenshot',
+  '试试用播客做副业引流':'Try podcasts to funnel side-gig leads',
+  '测试新形式看能否带私域咨询':'Test a new format for private-traffic inquiries',
+  '我副业亏了 8000 块，这钱是怎么亏掉的':'I lost 8000 on my side gig — here\'s how',
+  '自己7月26日':'Mine, Jul 26','自己7月22日':'Mine, Jul 22','总结':'Summary','自己常用':'My go-to','爆款拆解':'Hit teardown',
+  '接了个 3000 的活改了 8 稿，我算了下时薪':'Took a 3000 gig, 8 revisions — I did the hourly math',
+  '普通人做 XX 的 3 个坑，第 2 个我亏了钱才懂':'3 traps of doing XX, the 2nd I learned the hard way',
+  '如果这条对你有用，点个收藏别刷丢了':'If this helped, save it so you don\'t lose it',
+  '痛点开场 → 我踩的坑 → 3 个方法 → 结果对比 → 引导收藏':'Pain hook → my mistakes → 3 methods → result comparison → CTA to save',
+  '新人接单最容易被压价的 3 个话术，怎么回':'3 replies for newbies facing lowball offers',
+  '评论区高频问':'Top comment Q','自己想的':'My own','@某同行':'@a peer',
+  '把「副业时薪」做成一个系列，每期算一类活':'Turn "side-gig hourly rate" into a series',
+  '对标账号那条「凌晨发反而爆」，值得测一下时段':'That peer\'s "posting at dawn goes viral" — worth testing the slot',
+  '@某博主「我把简历改了37版」':'@a blogger "I revised my resume 37 times"',
+  '职场成长':'Career growth',
+  '数字够狠+过程真实，可复用到「报价改N版」':'Strong number + real process; reusable for "quote revised N times"',
+  '副业半年我只做对了这1件事':'In 6 months of side gigs I only got 1 thing right',
+  '副业接单':'Side gigs',
+  '结果前置+悬念，逼你看完':'Result-first + suspense forces you to watch',
+  '别再迷信MBTI了':'Stop worshipping MBTI',
+  '个人成长':'Personal growth',
+  '反常识开头制造争议，评论区吵起来':'Counterintuitive hook stirs debate; comments erupt',
+  '我接单亏了1万才懂的3个道理':'3 lessons I learned after losing 10k on gigs',
+  '自曝亏损最拉共鸣，副业赛道通杀':'Self-exposed loss resonates most; wins across side-gig niches',
+  '普通女生做自媒体的一天':'A day as an ordinary girl doing content',
+  '自媒体':'Content creation',
+  '身份代入+vlog真实感':'Persona hook + vlog authenticity',
+  '把「报价涨3倍」那条排到本周发':'Schedule the "triple your rates" post this week',
+  '整理 3 个自曝亏损型钩子进资产库':'Add 3 self-exposed-loss hooks to assets',
+  /* —— focusItems / 拼接补充 —— */
+  '说好 ':'Agreed for ',' 做，已过 <b>':', overdue by <b>','</b> 天':'</b> d',
+  '没定时间':'No date',
+  ' 发，已拖 <b>':', overdue <b>','</b> 天（现在「':'</b> d (now "','」）':'")',
+  '今天就该发了，现在还是「':'Due today, still "','」':'"',
+  '有 ':'There are ',' 条已发内容还没记数据':' published posts without data',
+  '去复盘板块补上曝光/涨粉，趋势才准':'Log reach/fans in Review for accurate trends',
+  '开个每周选题会，或去归因看看哪类最能打':'Hold a topic meeting, or check attribution for what performs',
+  '写一句再存':'Write something first',
+  '删掉这条待办？':'Delete this to-do?','」删了就没了。':'" — gone for good once deleted.',
+  '会删掉':'Will delete ','条做完的。':' finished items.',
+  '打卡成功！连续':'Checked in! Streak:','天 ⭐':' d ⭐',
+  /* —— renderHome 拼接补充 —— */
+  ' · 连续更新 ':' · Streak ',' 天 · 本周打卡 ':' d · this week ',
+  '已经连更 ':"You've kept a ",' 天啦，你太稳了！继续冲 🔥':'-day streak — rock solid! Keep going 🔥',
+  '有几件事有点急，先把红色的处理掉就轻松啦 🍃':'A few things are urgent — clear the red ones first 🍃',
+  '来源：':'Source: ','转成选题':'To topic',
+  '灵感池空的，刷到好点子随手记一条':'Ideas empty — jot one down when inspiration strikes',
+  ' 件':' items','都清完了':'All clear','我加的':'Mine',
+  '没有拖着的事，节奏很稳':'Nothing lagging — nice steady pace','去选题库挑一条爆款开写':'Pick a viral topic and start writing',
+  '恢复已收起 ':'Restore hidden ','清理已完成 ':'Clear done ',
+  '库里 ':'In library ',' 条待发 · 灵感池 ':' pending · Ideas ',' 条':' ',
+  '在库 ':'Active ','把管用的开头/标题存起来':'Save proven openings/titles',
+  '已存 ':'Saved ',' 条可复用资产':' reusable assets',
+  '今天待发 ':'Due today ',' · 逾期 ':' · Overdue ',
+  '记几条数据就能归因':'Log a few posts to enable attribution',
+  '最能打的':'Top ','：':': ',
+  '已得 ':'Earned ',' 枚徽章':' badges','坚持连更就能解锁':'Keep your streak to unlock',
+  '今天已打卡，连续 ':'Checked in today, streak ',' 天':' d',
+  '每周更满 5 天，解锁「稳定输出」':'Post 5×/week to unlock "Steady Output"',
+  /* —— 选题板块拼接补充 —— */
+  '本周已囤 ':'Stocked ',' 条 · 建议配比 3 爆款 + 3 日常 + 1 测试':' · suggested mix: 3 viral + 3 routine + 1 test',
+  '✓ 本周弹药够了，去选题库补大纲、排发布日':'✓ Enough for this week — flesh out outlines and set dates',
+  '再囤 ':'Stock ',' 条就够一周更新':' more for a full week',
+  '本周已开 ✓ 干得漂亮':'Held this week ✓ Nicely done','本周选题会开完了 ✓':'Weekly meeting done ✓',
+  '本周已开 · 囤 ':'Held · stocked ',' 条':' ','进行中 · ':'In progress · ','待开':'Pending',
+  '本周选题会已经开过啦':"You've already held this week's meeting",
+  '本周选题会打卡 🎉 弹药充足':'Meeting checked in 🎉 fully stocked',
+  '本周选题会打卡 🗓️ 记得补齐到 7 条':'Meeting checked in 🗓️ remember to reach 7 topics',
+  '已撤销本周打卡，可以重新开':"Undone — you can hold it again",
+  '先写个标题':'Write a title first','加进本周选题库 ✓ 可以接着录下一条':'Added to this week ✓ log the next one',
+  '删掉这条内容？':'Delete this post?','」删了，相关统计会跟着变。':'" — related stats will change.',
+  '已标为已发，去复盘记数据 📊':'Marked posted — log data in Review 📊','状态改成「':'Status changed to "','」了':'"',
+  '未排':'No date','大纲：':'Outline: ','素材：':'Assets: ',
+  '逾期 ':'Overdue ','这个库还没有选题':'No topics in this library',
+  '上面加一条，或开个每周选题会':'Add one above, or hold a topic meeting',
+  /* —— 灵感池 / 雷达 补充 —— */
+  '灵感池空的':'Ideas is empty','去「今日」页随手记，或刷到就来存':'Jot on the Today page, or save when you spot one',
+  '赛道：':'Niche: ','可借：':'Borrow: ',
+  '雷达还是空的':'The radar is empty','刷到同赛道爆款，收一条进来':'Spot a niche hit? Add one',
+  '仿一条':'Clone one',
+  '仿：':'Clone: ','参考：':'Ref: ',
+  '已按这条爆款起了个选题，去补大纲 ✏️':'Started a topic from this hit — add the outline ✏️',
+  '📡 多收几条同赛道爆款（≥2 条），这里就会自动帮你看出：<b>哪类钩子最火、哪个平台机会多、大家都在聊什么</b>。':'📡 Collect a few more hits in your niche (≥2) and this auto-reveals: <b>which hooks are hottest, which platforms have room, and what everyone\'s talking about</b>.',
+  '🪝 最火的钩子类型':'🪝 Hottest hook types','收几条时标上钩子':'Tag hooks as you collect',
+  '📱 爆款集中的平台':'📱 Platforms with the most hits',
+  '🔥 高频赛道词':'🔥 Frequent niche words','收几条标上赛道':'Tag niches as you collect',
+  '💡 看出来了：你收集的爆款里，':'💡 Spotted: among your hits, ',
+  '</b> 类钩子出现最多（':'</b> hooks appear most (',' 条）':' )',
+  '、集中在 ':', concentrated on ',
+  '。下次选题、写钩子，优先往这个方向靠 —— 点某条爆款的「仿一条」直接生成选题。':'. Next time, lean this way for topics and hooks — tap "Clone one" on a hit to generate a topic.',
+  /* —— 脚本页拼接补充 —— */
+  '🪄 生成拆解指令':'🪄 Generate teardown prompt','🪄 生成写脚本指令':'🪄 Generate script prompt',
+  '爆款拆解指令':'Viral Teardown Prompt','写脚本指令':'Scriptwriting Prompt',
+  '复制去 AI 跑，拆完把钩子公式/结构模板存进资产库、把选题灵感记进灵感池。':'Copy to any AI to run; save hook/structure templates to your assets and ideas to the pool.',
+  '复制去 AI 跑出初稿，再按你的真实语气改。跑得好用的开头，记得回来存进资产库。':'Copy to any AI for a first draft, then rewrite in your own voice. Save openings that work back to assets.',
+  '收进雷达了 📡':'Added to radar 📡',
+  /* —— 发布/复盘 补充 —— */
+  '今天已盯完 ✓':'Watched today ✓','未标':'Untagged',
+  '这个状态下没有内容':'No posts in this status','去选题库加一条并排上发布日':'Add one in the library and set a date',
+  '这条排期改好了':'Schedule updated',
+  '待观察':'Watching','及格':'Pass',
+  '标题总得写一个':'A title is required',
+  '完播 ':'Completion ',
+  /* —— CSV 表头 —— */
+  '阶段':'Stage','时段':'Time','钩子':'Hook','计划/发布日':'Planned/Publish date',
+  '完播率%':'Completion %','互动率%':'Engagement %','大纲':'Outline','笔记':'Note',
+  '结构':'Structure','可借':'Borrow','灵感':'Idea',
+  '【内容全表】':'[Full content table]','【脚本资产】':'[Script assets]','【对标拆解】':'[Benchmark teardown]','【灵感池】':'[Ideas]',
+  /* —— HTML 静态补充 —— */
+  '比如：拍一条「新人接单被压价怎么办」':'e.g. "How newbies handle lowball offers"',
+  '比如：给上周爆的那条补个第二集':"e.g. make a part 2 for last week's hit",
+  '谁的哪条/哪来的':'Whose / where from',
+  '选题标题':'Topic title','· 说不清=废选题，可先空着':"· can't explain it = dead topic; leave blank for now",
+  '🔥 爆款（重点打）':'🔥 Viral (main focus)','📌 日常（稳更新）':'📌 Routine (steady)',
+  '📚 系列（养 IP）':'📚 Series (build IP)','🧪 测试（试水）':'🧪 Test (experiment)',
+  'AI 帮我拆这条':'Let AI break this down',
+  '帮我写这条的脚本':'Write this script for me',
+  '5 很灵':'5 great','4 不错':'4 good','3 一般':'3 ok','2 偏弱':'2 weak','1 没用':'1 useless',
+  '各平台最佳发布时段':'Best Posting Time by Platform',
+  '已录数据':'Data logged','效果':'Rating',
+};
+function L(zh){ return LANG==='en' ? (T[zh]!==undefined?T[zh]:zh) : zh; }
+function applyStaticI18N(){
+  document.documentElement.lang=LANG;
+  if(LANG!=='en') return;
+  document.querySelectorAll('[data-i18n]').forEach(function(e){var k=e.getAttribute('data-i18n');if(k)e.textContent=L(k);});
+  document.querySelectorAll('[data-i18n-ph]').forEach(function(e){var k=e.getAttribute('data-i18n-ph');if(k)e.setAttribute('placeholder',L(k));});
+  document.querySelectorAll('[data-i18n-html]').forEach(function(e){var k=e.getAttribute('data-i18n-html');if(k)e.innerHTML=L(k);});
+  /* 导航（base 生成，无 data-i18n）：按 data-v 翻译标签文本节点 */
+  var NAV={home:'今日',topic:'选题',script:'脚本',publish:'发布',review:'复盘',me:'我的'};
+  document.querySelectorAll('.side button[data-v],.mtab button[data-v]').forEach(function(b){
+    var v=b.getAttribute('data-v'); if(!NAV[v])return;
+    /* 侧栏：文本在 button 直接文本节点；底 tab：在 span 里 */
+    var sp=b.querySelector('span');
+    if(sp){ sp.textContent=L(NAV[v]); }
+    else { for(var i=0;i<b.childNodes.length;i++){var n=b.childNodes[i];if(n.nodeType===3&&n.nodeValue.trim()){n.nodeValue=L(NAV[v]);}} }
+  });
+  /* 确认框按钮（base 写死） */
+  var mkno=document.getElementById('mk-no'); if(mkno)mkno.textContent=L('再想想');
+  var mkok=document.getElementById('mk-ok'); if(mkok)mkok.textContent=L('确定');
+  var mkt=document.getElementById('mk-t'); if(mkt&&mkt.textContent==='确认')mkt.textContent=L('确认');
+}
+/* 覆盖 base.fmtDate：中文「X月X日」，英文「M/D」 */
+function fmtDate(s){if(!s)return '-';const p=s.split('-');if(p.length!==3)return s;return LANG==='en'?((+p[1])+'/'+(+p[2])):((+p[1])+'月'+(+p[2])+'日');}
+
+/* ================= 初始数据 ================= */
+/* items: 一条内容的全生命周期。stage: 选题/在写/待发/已发。fmt: 视频/图文。
+   已发的才有数据(views/likes/...)。 */
+const DEFAULT={items:[],assets:[],ideas:[],refs:[],todos:[],
+  meta:{demo:false,hidden:[],checkins:[],weekMeet:[],golden:[],expAt:null,ncAt:0}};
+
+function seed(){
+  const D=n=>shift(-n);
+  return {
+    items:[
+      /* 已发 + 有数据 */
+      {id:uid(),title:L('我副业亏了 8000 块，这 3 个坑别再踩'),out:L('用亲身亏损经历讲新人接单3个坑'),lib:'爆款',fmt:'视频',plat:'抖音',slot:'晚 20-23',hook:'自曝亏损',stage:'已发',date:D(26),
+        views:48200,wr:41.5,likes:2140,colls:1380,cmts:340,fans:412,note:L('开头直接报数字，完播高'),demo:1},
+      {id:uid(),title:L('接了个 3000 的活，改了 8 稿'),out:L('算时薪劝新人先谈清改稿次数'),lib:'爆款',fmt:'图文',plat:'小红书',slot:'晚 20-23',hook:'具体数字',stage:'已发',date:D(22),
+        views:31500,wr:0,likes:1320,colls:690,cmts:200,fans:268,note:'',demo:1},
+      {id:uid(),title:L('我劝你别急着做私域'),out:L('反常识：先把内容做扎实'),lib:'日常',fmt:'图文',plat:'小红书',slot:'午 12-14',hook:'反差反常识',stage:'已发',date:D(19),
+        views:15600,wr:0,likes:620,colls:410,cmts:90,fans:97,note:L('争议大评论多但涨粉一般'),demo:1},
+      {id:uid(),title:L('做了半年副业，我把报价涨了 3 倍'),out:L('对比前后报价单讲提价动作'),lib:'爆款',fmt:'视频',plat:'抖音',slot:'晚 18-20',hook:'具体数字',stage:'已发',date:D(16),
+        views:26800,wr:38.2,likes:1020,colls:530,cmts:190,fans:203,note:'',demo:1},
+      {id:uid(),title:L('上班族做副业，我的一天怎么排'),out:L('身份代入，展示时间表'),lib:'日常',fmt:'图文',plat:'小红书',slot:'早 7-9',hook:'身份代入',stage:'已发',date:D(12),
+        views:9800,wr:0,likes:380,colls:190,cmts:40,fans:54,note:L('太日常缺信息量'),demo:1},
+      {id:uid(),title:L('粉丝多不等于能变现'),out:L('反常识讲变现逻辑'),lib:'日常',fmt:'视频',plat:'视频号',slot:'晚 20-23',hook:'反差反常识',stage:'已发',date:D(9),
+        views:12300,wr:33.0,likes:490,colls:270,cmts:80,fans:71,note:'',demo:1},
+      {id:uid(),title:L('副业第一个月只赚了 240 块'),out:L('自曝真实收入拉近距离'),lib:'爆款',fmt:'图文',plat:'小红书',slot:'晚 20-23',hook:'自曝亏损',stage:'已发',date:D(6),
+        views:22400,wr:0,likes:980,colls:570,cmts:140,fans:186,note:L('自曝亏损最灵'),demo:1},
+      {id:uid(),title:L('5 个我天天在用的 AI 工具'),out:L('工具合集'),lib:'日常',fmt:'图文',plat:'小红书',slot:'下午 15-18',hook:'其他',stage:'已发',date:D(3),
+        views:5200,wr:0,likes:140,colls:80,cmts:10,fans:16,note:L('工具合集已饱和'),demo:1},
+      /* 排期中（未发） */
+      {id:uid(),title:L('副业半年真实收入明细（附对账表）'),out:L('用半年流水讲普通人副业能赚多少'),lib:'爆款',fmt:'视频',plat:'',slot:'',hook:'',stage:'在写',date:shift(2),mat:L('接单对账表截图'),demo:1},
+      {id:uid(),title:L('报价从 800 涨到 3000 我改了什么'),out:L('对比报价单讲提价3动作'),lib:'爆款',fmt:'图文',plat:'',slot:'',hook:'',stage:'待发',date:shift(-1),mat:L('前后报价单对比'),demo:1},
+      {id:uid(),title:L('花 2000 报的课值不值'),out:L('客观评测这类课适合谁'),lib:'日常',fmt:'图文',plat:'',slot:'',hook:'',stage:'待写',date:shift(5),mat:L('付款记录+课程目录'),demo:1},
+      {id:uid(),title:L('副业接单被拖款我怎么防'),out:L('系列副业防坑第3集'),lib:'系列',fmt:'视频',plat:'',slot:'',hook:'',stage:'待写',date:shift(11),mat:L('催款话术截图'),demo:1},
+      {id:uid(),title:L('试试用播客做副业引流'),out:L('测试新形式看能否带私域咨询'),lib:'测试',fmt:'视频',plat:'',slot:'',hook:'',stage:'待写',date:shift(14),mat:'',demo:1}
+    ],
+    assets:[
+      {id:uid(),text:L('我副业亏了 8000 块，这钱是怎么亏掉的'),kind:'开头钩子',src:L('自己7月26日'),rate:5,at:D(20),demo:1},
+      {id:uid(),text:L('接了个 3000 的活改了 8 稿，我算了下时薪'),kind:'开头钩子',src:L('自己7月22日'),rate:5,at:D(18),demo:1},
+      {id:uid(),text:L('普通人做 XX 的 3 个坑，第 2 个我亏了钱才懂'),kind:'标题公式',src:L('总结'),rate:4,at:D(15),demo:1},
+      {id:uid(),text:L('如果这条对你有用，点个收藏别刷丢了'),kind:'结尾CTA',src:L('自己常用'),rate:4,at:D(10),demo:1},
+      {id:uid(),text:L('痛点开场 → 我踩的坑 → 3 个方法 → 结果对比 → 引导收藏'),kind:'结构套路',src:L('爆款拆解'),rate:5,at:D(6),demo:1}
+    ],
+    ideas:[
+      {id:uid(),text:L('新人接单最容易被压价的 3 个话术，怎么回'),src:L('评论区高频问'),at:D(1),demo:1},
+      {id:uid(),text:L('把「副业时薪」做成一个系列，每期算一类活'),src:L('自己想的'),at:D(2),demo:1},
+      {id:uid(),text:L('对标账号那条「凌晨发反而爆」，值得测一下时段'),src:L('@某同行'),at:D(3),demo:1}
+    ],
+    refs:[
+      {id:uid(),title:L('@某博主「我把简历改了37版」'),plat:'小红书',hk:'具体数字',heat:'1w-10w 爆款',niche:L('职场成长'),why:L('数字够狠+过程真实，可复用到「报价改N版」'),at:D(4),demo:1},
+      {id:uid(),title:L('副业半年我只做对了这1件事'),plat:'抖音',hk:'结果前置',heat:'10w+ 现象级',niche:L('副业接单'),why:L('结果前置+悬念，逼你看完'),at:D(6),demo:1},
+      {id:uid(),title:L('别再迷信MBTI了'),plat:'小红书',hk:'反差反常识',heat:'1w-10w 爆款',niche:L('个人成长'),why:L('反常识开头制造争议，评论区吵起来'),at:D(8),demo:1},
+      {id:uid(),title:L('我接单亏了1万才懂的3个道理'),plat:'小红书',hk:'自曝亏损',heat:'10w+ 现象级',niche:L('副业接单'),why:L('自曝亏损最拉共鸣，副业赛道通杀'),at:D(2),demo:1},
+      {id:uid(),title:L('普通女生做自媒体的一天'),plat:'视频号',hk:'身份代入',heat:'千赞 小爆',niche:L('自媒体'),why:L('身份代入+vlog真实感'),at:D(10),demo:1}
+    ],
+    todos:[
+      {id:uid(),title:L('把「报价涨3倍」那条排到本周发'),due:today(),done:false,at:today(),demo:1},
+      {id:uid(),title:L('整理 3 个自曝亏损型钩子进资产库'),due:shift(2),done:false,at:today(),demo:1}
+    ],
+    meta:{demo:true,hidden:[],checkins:[D(1),D(2),D(4),D(5)],weekMeet:[],golden:[],expAt:null,ncAt:0}
+  };
+}
+
+DB = load() || seed();
+['items','assets','ideas','refs','todos'].forEach(k=>{ if(!Array.isArray(DB[k])) DB[k]=[]; });
+DB.meta = Object.assign({demo:false,hidden:[],checkins:[],weekMeet:[],golden:[],expAt:null,ncAt:0}, DB.meta||{});
+['hidden','checkins','weekMeet','golden'].forEach(k=>{ if(!Array.isArray(DB.meta[k])) DB.meta[k]=[]; });
+/* 迁移：老版本选题库带「款」字（爆款/日常/系列/测试）统一去掉，保持显示干净 */
+var _LIBMIG={'爆款款':'爆款','日常款':'日常','系列款':'系列','测试款':'测试'};
+DB.items.forEach(it=>{ if(it && _LIBMIG[it.lib]) it.lib=_LIBMIG[it.lib]; });
+
+function total(){return DB.items.length+DB.assets.length+DB.ideas.length+DB.refs.length+DB.todos.length;}
+function clearForm(ids){ids.forEach(i=>{const e=document.getElementById(i);if(e)e.value='';});}
+
+/* ================= 统计工具 ================= */
+function posted(){return DB.items.filter(i=>i.stage==='已发');}
+function pending(){return DB.items.filter(i=>i.stage!=='已发');}
+function eng(p){return (+p.likes||0)+(+p.colls||0)+(+p.cmts||0);}
+function er(p){return p.views? eng(p)/(+p.views)*100:0;}
+function avgViews(){const a=posted().filter(p=>+p.views>0);return a.length? a.reduce((s,p)=>s+(+p.views||0),0)/a.length:0;}
+function avgER(){const a=posted().filter(p=>+p.views>0);return a.length? a.reduce((s,p)=>s+er(p),0)/a.length:0;}
+function avgFollow(){const a=posted().filter(p=>+p.views>0);return a.length? a.reduce((s,p)=>s+(+p.fans||0)/(+p.views),0)/a.length*100:0;}
+function avgWatch(){const a=posted().filter(p=>+p.wr>0);return a.length? a.reduce((s,p)=>s+(+p.wr||0),0)/a.length:0;}
+function streak(){const s=new Set(DB.meta.checkins);let n=0;for(let i=0;i<400;i++){if(s.has(shift(-i)))n++;else if(i>0)break;}return n;}
+function weekDone(){let n=0;const s=new Set(DB.meta.checkins);for(let i=0;i<7;i++)if(s.has(shift(-i)))n++;return n;}
+function weekKey(d){const dt=new Date(d+'T00:00:00');const on=(dt.getDay()+6)%7;dt.setDate(dt.getDate()-on);
+  return dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0');}
+
+/* ================= 灵感速记 ================= */
+function quickIdea(){
+  const t=document.getElementById('qi-t').value.trim();
+  if(!t){toast(L('写一句再存'));document.getElementById('qi-t').focus();return;}
+  var rec={id:uid(),text:t,src:document.getElementById('qi-s').value.trim(),at:today()};
+  DB.ideas.unshift(rec);
+  clearForm(['qi-t','qi-s']); save(); renderHome(); renderTopic(); toast(L('存进灵感池了 💡'));
+}
+function delIdea(id){const x=DB.ideas.find(i=>i.id===id);DB.ideas=DB.ideas.filter(x=>x.id!==id);save();renderHome();renderTopic();toast(L('已删除'));}
+function ideaToTopic(id){
+  const x=DB.ideas.find(i=>i.id===id); if(!x)return;
+  DB.items.unshift({id:uid(),title:x.text,out:'',lib:'测试',fmt:'视频',plat:'',slot:'',hook:'',stage:'待写',date:'',mat:'',at:today()});
+  x._converted=true;
+  DB.ideas=DB.ideas.filter(i=>i.id!==id);
+  save(); renderAll(); go('topic'); toast(L('已转成选题，去补大纲和发布日 👉'));
+}
+
+/* ================= 今天要做的（待办 + 系统提醒） ================= */
+function focusItems(){
+  const out=[], t=today(), H=DB.meta.hidden;
+  DB.todos.filter(x=>!x.done).forEach(x=>{
+    const over=x.due&&dayDiff(x.due,t)>0;
+    out.push({manual:true,urgent:!!over,title:x.title,
+      desc:over?(L('说好 ')+fmtDate(x.due)+L(' 做，已过 <b>')+dayDiff(x.due,t)+L('</b> 天')):(x.due===t?L('今天要做的'):(x.due?L('排在 ')+fmtDate(x.due):L('没定时间'))),
+      acts:[{t:L('做完了'),c:'b-ok',f:'doneTodo("'+x.id+'")'},{t:L('删掉'),c:'b-del',f:'delTodo("'+x.id+'")'}]});
+  });
+  pending().forEach(x=>{
+    if(!x.date) return;
+    const k='over:'+x.id;
+    if(dayDiff(x.date,t)>0 && !H.includes(k)){
+      out.push({key:k,urgent:true,title:x.title,desc:L('计划 ')+fmtDate(x.date)+L(' 发，已拖 <b>')+dayDiff(x.date,t)+L('</b> 天（现在「')+L(x.stage)+L('」）'),
+        acts:[{t:L('标为已发'),c:'b-ok',f:'markSent("'+x.id+'")'},{t:L('顺延一周'),c:'b-line',f:'delay("'+x.id+'")'},{t:L('不提醒'),c:'b-mute',f:'hideFocus("'+k+'")'}]});
+      return;
+    }
+    const k2='due:'+x.id;
+    if(x.date===t && !H.includes(k2)){
+      out.push({key:k2,urgent:false,title:x.title,desc:L('今天就该发了，现在还是「')+L(x.stage)+L('」'),
+        acts:[{t:L('标为已发'),c:'b-ok',f:'markSent("'+x.id+'")'},{t:L('去发布板块'),c:'b-main',f:'go(\'publish\')'},{t:L('不提醒'),c:'b-mute',f:'hideFocus("'+k2+'")'}]});
+    }
+  });
+  const k3='need-data';
+  const noData=posted().filter(p=>!(+p.views>0));
+  if(noData.length && !H.includes(k3)){
+    out.push({key:k3,urgent:false,title:L('有 ')+noData.length+L(' 条已发内容还没记数据'),desc:L('去复盘板块补上曝光/涨粉，趋势才准'),
+      acts:[{t:L('去记数据'),c:'b-main',f:'go(\'review\')'},{t:L('不提醒'),c:'b-mute',f:'hideFocus("'+k3+'")'}]});
+  }
+  const k4='empty-hot';
+  if(DB.items.filter(x=>x.lib==='爆款'&&x.stage!=='已发').length===0 && !H.includes(k4)){
+    out.push({key:k4,urgent:false,title:L('爆款选题空了'),desc:L('开个每周选题会，或去归因看看哪类最能打'),
+      acts:[{t:L('去选题'),c:'b-main',f:'go(\'topic\')'},{t:L('不提醒'),c:'b-mute',f:'hideFocus("'+k4+'")'}]});
+  }
+  return out;
+}
+function addTodo(){
+  const t=document.getElementById('td-t').value.trim();
+  if(!t){toast(L('写一句话再加'));document.getElementById('td-t').focus();return;}
+  DB.todos.unshift({id:uid(),title:t,due:document.getElementById('td-d').value||today(),done:false,at:today()});
+  document.getElementById('td-t').value=''; save(); renderHome(); toast(L('加好了'));
+}
+function doneTodo(id){const x=DB.todos.find(t=>t.id===id);if(!x)return;x.done=true;save();renderHome();renderMe();toast(L('干得漂亮 👍'));}
+function delTodo(id){const x=DB.todos.find(t=>t.id===id);if(!x)return;
+  confirmBox(L('删掉这条待办？'),'「'+x.title.slice(0,26)+L('」删了就没了。'),()=>{DB.todos=DB.todos.filter(t=>t.id!==id);save();renderHome();toast(L('已删除'));});}
+function hideFocus(k){DB.meta.hidden.push(k);save();renderHome();toast(L('这条不再提醒了'));}
+function restoreHidden(){DB.meta.hidden=[];save();renderHome();toast(L('都找回来了'));}
+function cleanDone(){const n=DB.todos.filter(x=>x.done).length;
+  confirmBox(L('清掉已完成的待办？'),L('会删掉')+n+L('条做完的。'),()=>{DB.todos=DB.todos.filter(x=>!x.done);save();renderHome();toast(L('清好了'));});}
+function markSent(id){const x=DB.items.find(t=>t.id===id);if(!x)return;x.stage='已发';if(!x.date)x.date=today();save();renderAll();toast(L('已标为已发，记得去复盘记数据'));}
+function delay(id){const x=DB.items.find(t=>t.id===id);if(!x)return;
+  const b=x.date&&dayDiff(x.date,today())>0?today():(x.date||today());
+  const d=new Date(b+'T00:00:00');d.setDate(d.getDate()+7);
+  x.date=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  save();renderAll();toast(L('顺延到 ')+fmtDate(x.date));}
+
+/* ================= 打卡 ================= */
+function checkIn(){
+  const t=today();
+  if(DB.meta.checkins.includes(t)){toast(L('今天已经打过卡了，明天继续 ✨'));return;}
+  DB.meta.checkins.push(t);save();renderAll();toast(L('打卡成功！连续')+streak()+L('天 ⭐'));
+}
+
+/* ================= 首页渲染 ================= */
+function renderHome(){
+  const t=today(), av=avgViews();
+  document.getElementById('h-sub').textContent=fmtDate(t)+L(' · 连续更新 ')+streak()+L(' 天 · 本周打卡 ')+weekDone()+'/7';
+  document.getElementById('h-chips').innerHTML=[
+    ['⭐',L('连更'),streak()],['🔥',L('爆款待发'),DB.items.filter(x=>x.lib==='爆款'&&x.stage!=='已发').length],
+    ['💡',L('灵感池'),DB.ideas.length],['📊',L('已发'),posted().length]
+  ].map(([e,l,v])=>'<div class="chip"><em>'+e+'</em>'+l+' <span class="n">'+v+'</span></div>').join('');
+
+  /* 连更里程碑带 */
+  const stk=streak();
+  const MS=[[1,'🌱','起步'],[3,'🌸','3天'],[7,'🔥','一周'],[14,'💪','两周'],[30,'👑','月更'],[100,'🏆','百天']];
+  const msEl=document.getElementById('h-ms');
+  if(msEl) msEl.innerHTML=MS.map(function(m){return '<div class="ms'+(stk>=m[0]?' hit':'')+'"><div class="msi">'+m[1]+'</div><div class="msn">'+L(m[2])+'</div></div>';}).join('');
+
+  /* 每日激励语（按日期轮换 + 结合状态） */
+  const cheerEl=document.getElementById('cheer-t');
+  if(cheerEl){
+    const CHEERS=[
+      '今天也要把想法变成作品呀～',
+      '慢慢来，稳定更新的人最后都赢了 💪',
+      '你收集的每条灵感，都会变成下一个爆款 ✨',
+      '别怕数据不好，复盘一下就是进步 🌱',
+      '坚持发，平台迟早会看见你 🌟',
+      '今天的一条内容，是未来粉丝认识你的入口 💗'
+    ];
+    let msg;
+    if(stk>=7) msg=L('已经连更 ')+stk+L(' 天啦，你太稳了！继续冲 🔥');
+    else if(focusItems().filter(function(i){return i.urgent;}).length) msg=L('有几件事有点急，先把红色的处理掉就轻松啦 🍃');
+    else { const d=new Date(); msg=L(CHEERS[(d.getFullYear()+d.getMonth()*31+d.getDate())%CHEERS.length]); }
+    cheerEl.textContent=msg;
+  }
+
+  /* 灵感速记 最近3条 */
+  const recent=DB.ideas.slice(0,3);
+  document.getElementById('qi-recent').innerHTML = recent.length?
+    ('<div class="ideas">'+recent.map(i=>
+      '<div class="idea"><div class="it">'+esc(i.text)+'</div><div class="is">'+(i.src?L('来源：')+esc(i.src)+' · ':'')+fmtDate(i.at)+'</div>'+
+      '<div class="ib"><button class="btn b-sm b-main" onclick="ideaToTopic(\''+i.id+'\')">'+L('转成选题')+'</button>'+
+      '<button class="btn b-sm b-del" onclick="delIdea(\''+i.id+'\')">'+L('删')+'</button></div></div>').join('')+'</div>')
+    : '<div class="empty" style="padding:14px"><div class="e2">'+L('灵感池空的，刷到好点子随手记一条')+'</div></div>';
+
+  const items=focusItems();
+  document.getElementById('f-q').textContent=items.length?items.length+L(' 件'):L('都清完了');
+  document.getElementById('f-list').innerHTML=items.length?items.map(i=>
+    '<div class="fi'+(i.urgent?' urgent':'')+'"><div class="b"><div class="t">'+esc(i.title)+
+    (i.manual?' <span class="pill p-brand">'+L('我加的')+'</span>':'')+'</div><div class="d">'+i.desc+'</div></div>'+
+    '<div class="a">'+i.acts.map(a=>'<button class="btn b-sm '+a.c+'" onclick=\''+a.f+'\'>'+a.t+'</button>').join('')+'</div></div>'
+  ).join(''):'<div class="empty"><div class="e1">✓</div><div class="e2">'+L('没有拖着的事，节奏很稳')+'</div><div class="e3">'+L('去选题库挑一条爆款开写')+'</div></div>';
+
+  const hn=DB.meta.hidden.length,dn=DB.todos.filter(x=>x.done).length;
+  const br=document.getElementById('btn-restore'),bc=document.getElementById('btn-clean');
+  br.style.display=hn?'inline-block':'none';br.textContent=L('恢复已收起 ')+hn;
+  bc.style.display=dn?'inline-block':'none';bc.textContent=L('清理已完成 ')+dn;
+
+  const at=attrStats('lib')[0];
+  document.getElementById('mods').innerHTML=[
+    {k:'topic',b:L('题'),c:'#BA7517',n:L('选题'),
+     d:L('库里 ')+pending().length+L(' 条待发 · 灵感池 ')+DB.ideas.length+L(' 条'),
+     cur:pending().length,max:16,p:L('在库 ')+pending().length+'/16'},
+    {k:'script',b:L('本'),c:'#185FA5',n:L('脚本资产'),
+     d: DB.assets.length? (L('已存 ')+DB.assets.length+L(' 条可复用资产')) : L('把管用的开头/标题存起来'),
+     cur:DB.assets.length,max:30,p:L('已存 ')+DB.assets.length+'/30'},
+    {k:'publish',b:L('发'),c:'#0F6E56',n:L('发布'),
+     d:L('今天待发 ')+DB.items.filter(x=>x.stage!=='已发'&&x.date===t).length+L(' · 逾期 ')+DB.items.filter(x=>x.stage!=='已发'&&x.date&&dayDiff(x.date,t)>0).length,
+     cur:posted().length,max:Math.max(DB.items.length,1),p:L('已发')+' '+posted().length+'/'+DB.items.length},
+    {k:'review',b:L('盘'),c:'#993556',n:L('复盘'),
+     d: at? (L('最能打的')+L('选题库')+L('：')+L(at.name)) : L('记几条数据就能归因'),
+     cur:posted().filter(p=>+p.views>0).length,max:Math.max(posted().length,1),
+     p:L('已录数据')+' '+posted().filter(p=>+p.views>0).length+'/'+posted().length},
+    {k:'me',b:L('章'),c:'#7A5AF0',n:L('成就'),
+     d:L('已得 ')+medals().filter(m=>m.got).length+'/'+medals().length+L(' 枚徽章'),
+     cur:medals().filter(m=>m.got).length,max:medals().length,p:L('坚持连更就能解锁')}
+  ].map(m=>'<button class="mod" onclick="go(\''+m.k+'\')"><div class="t"><span class="b" style="background:'+m.c+'">'+m.b+'</span>'+m.n+'</div>'+
+    '<div class="d">'+esc(m.d)+'</div><div class="bar"><i style="width:'+Math.min(100,m.cur/m.max*100)+'%"></i></div><div class="p">'+m.p+'</div></button>').join('');
+
+  document.getElementById('dock-hint').textContent=
+    DB.meta.checkins.includes(t)? L('今天已打卡，连续 ')+streak()+L(' 天') : L('每周更满 5 天，解锁「稳定输出」');
+}
+
+/* ================= 选题板块 ================= */
+const LIBS=['爆款','日常','系列','测试'];
+const LIB_TARGET={'爆款':3,'日常':3,'系列':0,'测试':1};  /* 本周建议配比 */
+const LIB_COLOR={'爆款':'#C4362F','日常':'#7A5AF0','系列':'#B4761A','测试':'#948C83'};
+const LIB_PILL={'爆款':'p-red','日常':'p-brand','系列':'p-warn','测试':'p-gray'};
+const WEEK_STEPS=[
+  {t:'回看上周数据',d:'翻一眼「复盘」的归因，哪类选题库/钩子真的带来曝光——这周往它加码。'},
+  {t:'扒热点 + 评论区',d:'看平台热榜、同行爆款；翻自己评论区，粉丝反复问的就是现成选题。'},
+  {t:'定 7 条选题',d:'<b>3 爆款 + 3 日常 + 1 测试</b>，别贪多，够一周更新就行。'},
+  {t:'每条写一句话大纲',d:'先把标题敲进下面的框囤着，之后在选题库补大纲想透再发。'}
+];
+/* 本周（自然周内）新增的选题 */
+function weekItems(){
+  const wk=weekKey(today());
+  return DB.items.filter(x=>x.at && weekKey(x.at)===wk);
+}
+function renderWeekMeet(){
+  document.getElementById('wm-steps').innerHTML=WEEK_STEPS.map((s,i)=>
+    '<div class="step"><div class="no">'+(i+1)+'</div><div class="sb"><div class="st">'+esc(L(s.t))+'</div><div class="sd">'+L(s.d)+'</div></div></div>').join('');
+  /* 本周配比进度 */
+  const wi=weekItems(), cnt={};
+  LIBS.forEach(l=>cnt[l]=wi.filter(x=>x.lib===l).length);
+  const total=wi.length;
+  document.getElementById('wm-mix').innerHTML=
+    '<div class="wmb-hd" style="margin:0 0 2px">'+L('本周已囤 ')+total+L(' 条 · 建议配比 3 爆款 + 3 日常 + 1 测试')+'</div>'+
+    LIBS.map(l=>{
+      const n=cnt[l], tg=LIB_TARGET[l];
+      const pct=tg? Math.min(100,n/tg*100) : (n?100:0);
+      const doneCls=(tg&&n>=tg)?' done':'';
+      return '<div class="mixrow"><span class="ml">'+L(l)+'</span>'+
+        '<span class="mt"><i style="width:'+pct+'%;background:'+LIB_COLOR[l]+'"></i></span>'+
+        '<span class="mn'+doneCls+'">'+n+(tg?' / '+tg:'')+'</span></div>';
+    }).join('')+
+    '<div class="wmtip">'+(total>=7?L('✓ 本周弹药够了，去选题库补大纲、排发布日'):L('再囤 ')+Math.max(0,7-total)+L(' 条就够一周更新'))+'</div>';
+
+  const done=(DB.meta.weekMeet||[]).includes(weekKey(today()));
+  const b=document.getElementById('wm-btn'), u=document.getElementById('wm-undo');
+  b.textContent=done?L('本周已开 ✓ 干得漂亮'):L('本周选题会开完了 ✓');
+  b.disabled=done;
+  u.style.display=done?'inline-block':'none';
+  document.getElementById('wm-q').textContent=done?L('本周已开 · 囤 ')+total+L(' 条'):(total?L('进行中 · ')+total+L(' 条'):L('待开'));
+}
+function doWeekMeet(){
+  const k=weekKey(today());
+  if(DB.meta.weekMeet.includes(k)){toast(L('本周选题会已经开过啦'));return;}
+  DB.meta.weekMeet.push(k);save();renderAll();
+  const n=weekItems().length;
+  toast(n>=7?L('本周选题会打卡 🎉 弹药充足'):L('本周选题会打卡 🗓️ 记得补齐到 7 条'));
+}
+function undoWeekMeet(){
+  const k=weekKey(today());
+  DB.meta.weekMeet=DB.meta.weekMeet.filter(x=>x!==k);
+  save();renderAll();toast(L('已撤销本周打卡，可以重新开'));
+}
+function saveTopic(){
+  const t=document.getElementById('t-t').value.trim();
+  if(!t){toast(L('先写个标题'));document.getElementById('t-t').focus();return;}
+  DB.items.unshift({id:uid(),title:t,out:document.getElementById('t-out').value.trim(),
+    lib:document.getElementById('t-lv').value,fmt:document.getElementById('t-fmt').value,
+    plat:'',slot:'',hook:'',stage:'待写',date:document.getElementById('t-d').value||'',
+    mat:document.getElementById('t-m').value.trim(),at:today()});
+  var _savedTopic={title:t,out:document.getElementById('t-out').value.trim(),lib:document.getElementById('t-lv').value,at:today()};
+  clearForm(['t-t','t-out','t-m']); save(); renderAll();
+
+  const tt=document.getElementById('t-t'); if(tt)tt.focus();
+  toast(L('加进本周选题库 ✓ 可以接着录下一条'));
+}
+function delItem(id){const x=DB.items.find(t=>t.id===id);if(!x)return;
+  confirmBox(L('删掉这条内容？'),'「'+x.title.slice(0,24)+L('」删了，相关统计会跟着变。'),()=>{DB.items=DB.items.filter(t=>t.id!==id);save();renderAll();toast(L('已删除'));});}
+function advStage(id){
+  const x=DB.items.find(t=>t.id===id);if(!x)return;
+  const NEXT={'待写':'在写','在写':'待发','待发':'已发'};
+  const nx=NEXT[x.stage]; if(!nx)return;
+  x.stage=nx;
+  if(nx==='已发'&&!x.date)x.date=today();
+  save();renderAll();
+  toast(nx==='已发'?L('已标为已发，去复盘记数据 📊'):L('状态改成「')+L(nx)+L('」了'));
+}
+let tFilter='全部';
+function renderTopic(){
+  renderWeekMeet();
+  const lv=['全部'].concat(LIBS,['已发']);
+  document.getElementById('t-tags').innerHTML=lv.map(l=>{
+    const n=l==='全部'?DB.items.length:l==='已发'?posted().length:DB.items.filter(x=>x.lib===l&&x.stage!=='已发').length;
+    return '<button class="'+(tFilter===l?'on':'')+'" onclick="tFilter=\''+l+'\';renderTopic()">'+L(l)+' '+n+'</button>';
+  }).join('');
+  let arr=[...DB.items];
+  if(tFilter==='已发')arr=arr.filter(x=>x.stage==='已发');
+  else if(tFilter!=='全部')arr=arr.filter(x=>x.lib===tFilter&&x.stage!=='已发');
+  const order={'爆款':0,'日常':1,'系列':2,'测试':3};
+  arr.sort((a,b)=>(order[a.lib]??9)-(order[b.lib]??9)||(a.date||'').localeCompare(b.date||''));
+  document.getElementById('tl-q').textContent=arr.length+L(' 条');
+  const t=today();
+  const STAGE_PILL={'已发':'p-ok','待发':'p-brand','在写':'p-warn','待写':'p-gray'};
+  /* 下一步流转：待写→在写→待发→已发 */
+  const NEXT={'待写':'在写','在写':'待发','待发':'已发'};
+  document.getElementById('tl-body').innerHTML=arr.length?arr.map(x=>{
+    const over=x.stage!=='已发'&&x.date&&dayDiff(x.date,t)>0;
+    const lp=LIB_PILL[x.lib]||'p-gray';
+    const sub=[x.out?L('大纲：')+esc(x.out):'',x.mat?L('素材：')+esc(x.mat):''].filter(Boolean).join(' · ');
+    const nx=NEXT[x.stage];
+    const nextBtn = nx ? '<button class="btn b-sm '+(nx==='已发'?'b-ok':'b-main')+'" onclick="advStage(\''+x.id+'\')">→ '+L(nx)+'</button>' : '';
+    return '<tr><td data-l="'+L('选题')+'" class="nl"><div class="tt">'+esc(x.title)+
+      (over?' <span class="pill p-red">'+L('逾期 ')+dayDiff(x.date,t)+L(' 天')+'</span>':'')+
+      ' <span class="pill '+(STAGE_PILL[x.stage]||'p-gray')+'">'+esc(L(x.stage))+'</span></div>'+
+      (sub?'<div class="ts">'+sub+'</div>':'')+'</td>'+
+      '<td data-l="'+L('选题库')+'"><span class="pill '+lp+'">'+esc(L(x.lib))+'</span></td>'+
+      '<td data-l="'+L('形态')+'">'+esc(x.fmt?L(x.fmt):'—')+'</td>'+
+      '<td data-l="'+L('计划')+'">'+(x.date?fmtDate(x.date):L('未排'))+'</td>'+
+      '<td class="nl"><div class="ta">'+nextBtn+
+        '<button class="btn b-sm b-del" onclick="delItem(\''+x.id+'\')">'+L('删')+'</button></div></td></tr>';
+  }).join(''):'<tr><td class="nl"><div class="empty"><div class="e1">📚</div><div class="e2">'+L('这个库还没有选题')+'</div><div class="e3">'+L('上面加一条，或开个每周选题会')+'</div></div></td></tr>';
+
+  /* 灵感池 */
+  document.getElementById('ip-q').textContent=DB.ideas.length+L(' 条');
+  document.getElementById('ip-list').innerHTML=DB.ideas.length?DB.ideas.map(i=>
+    '<div class="idea"><div class="it">'+esc(i.text)+'</div><div class="is">'+(i.src?L('来源：')+esc(i.src)+' · ':'')+fmtDate(i.at)+'</div>'+
+    '<div class="ib"><button class="btn b-sm b-main" onclick="ideaToTopic(\''+i.id+'\')">'+L('转成选题')+'</button>'+
+    '<button class="btn b-sm b-del" onclick="delIdea(\''+i.id+'\')">'+L('删')+'</button></div></div>').join('')
+    :'<div class="empty" style="grid-column:1/-1"><div class="e1">💡</div><div class="e2">'+L('灵感池空的')+'</div><div class="e3">'+L('去「今日」页随手记，或刷到就来存')+'</div></div>';
+
+  /* 爆款雷达：洞察 + 列表 */
+  renderRadarInsight();
+  renderRefBtns();
+  const HEAT_PILL={'10w+ 现象级':'p-red','1w-10w 爆款':'p-warn','千赞 小爆':'p-brand'};
+  document.getElementById('rf-body').innerHTML=DB.refs.length?DB.refs.map(r=>
+    '<tr><td data-l="'+L('爆款')+'" class="nl"><div class="tt">'+esc(r.title)+'</div>'+
+      ((r.niche||r.why)?'<div class="ts">'+(r.niche?L('赛道：')+esc(r.niche):'')+(r.niche&&r.why?' · ':'')+(r.why?L('可借：')+esc(r.why):'')+'</div>':'')+'</td>'+
+    '<td data-l="'+L('平台/钩子')+'">'+esc(r.plat?L(r.plat):'—')+(r.hk?'<div class="ts">'+esc(L(r.hk))+'</div>':'')+'</td>'+
+    '<td data-l="'+L('热度')+'">'+(r.heat?'<span class="pill '+(HEAT_PILL[r.heat]||'p-gray')+'">'+esc(L(r.heat))+'</span>':'—')+'</td>'+
+    '<td class="nl"><div class="ta"><button class="btn b-sm b-main" onclick="refToTopic(\''+r.id+'\')">'+L('仿一条')+'</button>'+
+    '<button class="btn b-sm b-del" onclick="delRef(\''+r.id+'\')">'+L('删')+'</button></div></td></tr>'
+  ).join(''):'<tr><td class="nl"><div class="empty"><div class="e1">📡</div><div class="e2">'+L('雷达还是空的')+'</div><div class="e3">'+L('刷到同赛道爆款，收一条进来')+'</div></div></td></tr>';
+}
+/* 爆款雷达洞察聚合 */
+function renderRadarInsight(){
+  const box=document.getElementById('radar-ins'); if(!box)return;
+  const rs=DB.refs;
+  if(rs.length<2){
+    box.innerHTML='<div class="rins-tip">'+L('📡 多收几条同赛道爆款（≥2 条），这里就会自动帮你看出：<b>哪类钩子最火、哪个平台机会多、大家都在聊什么</b>。')+'</div>';
+    return;
+  }
+  function dist(field){
+    const m={}; rs.forEach(r=>{const k=(r[field]||'').trim();if(k)m[k]=(m[k]||0)+1;});
+    return Object.entries(m).map(([k,v])=>({k,v})).sort((a,b)=>b.v-a.v);
+  }
+  const hk=dist('hk'), pl=dist('plat');
+  const mxh=Math.max(1,...hk.map(x=>x.v)), mxp=Math.max(1,...pl.map(x=>x.v));
+  /* 高频词：从标题+赛道里粗提 2-4 字词 */
+  const words={};
+  rs.forEach(r=>{ (r.niche||'').split(/[\s、,，\/]+/).forEach(w=>{w=w.trim();if(w.length>=2)words[w]=(words[w]||0)+1;}); });
+  const topWords=Object.entries(words).map(([k,v])=>({k,v})).sort((a,b)=>b.v-a.v).slice(0,6);
+  const bar=(arr,mx)=>arr.slice(0,4).map(x=>'<div class="rrow"><span class="rn">'+esc(L(x.k))+'</span><span class="rbar"><i style="width:'+(x.v/mx*100)+'%"></i></span><span class="rv">'+x.v+'</span></div>').join('');
+  const topHk=hk[0], topPl=pl[0];
+  box.innerHTML=
+    '<div class="rins"><div class="rt">'+L('🪝 最火的钩子类型')+'</div>'+(hk.length?bar(hk,mxh):'<div class="ts">'+L('收几条时标上钩子')+'</div>')+'</div>'+
+    '<div class="rins"><div class="rt">'+L('📱 爆款集中的平台')+'</div>'+(pl.length?bar(pl,mxp):'<div class="ts">—</div>')+'</div>'+
+    '<div class="rins"><div class="rt">'+L('🔥 高频赛道词')+'</div>'+(topWords.length?topWords.map(w=>'<span class="rword">'+esc(L(w.k))+' '+w.v+'</span>').join(''):'<div class="ts">'+L('收几条标上赛道')+'</div>')+'</div>'+
+    '<div class="rins-tip">'+L('💡 看出来了：你收集的爆款里，')+(topHk?'<b>'+esc(L(topHk.k))+L('</b> 类钩子出现最多（')+topHk.v+L(' 条）'):'')+(topPl?L('、集中在 ')+'<b>'+esc(L(topPl.k))+'</b>':'')+L('。下次选题、写钩子，优先往这个方向靠 —— 点某条爆款的「仿一条」直接生成选题。')+'</div>';
+}
+function refToTopic(id){
+  const r=DB.refs.find(x=>x.id===id); if(!r)return;
+  DB.items.unshift({id:uid(),title:L('仿：')+(r.title||'').slice(0,20),out:r.why||'',lib:'爆款',
+    fmt:(r.plat==='抖音'||r.plat==='视频号'||r.plat==='B站')?'视频':'图文',
+    plat:'',slot:'',hook:r.hk||'',stage:'待写',date:'',mat:L('参考：')+(r.title||''),at:today()});
+  save(); renderAll(); go('topic'); toast(L('已按这条爆款起了个选题，去补大纲 ✏️'));
+}
+/* ================= AI 指令浮层（通用） ================= */
+var _promptText='';
+function showPrompt(title,desc,text){
+  _promptText=text;
+  document.getElementById('pm-title').textContent=title;
+  document.getElementById('pm-desc').textContent=desc||'';
+  document.getElementById('pm-text').textContent=text;
+  document.getElementById('pmask').classList.add('on');
+  document.getElementById('pmodal').classList.add('on');
+}
+function closePrompt(){
+  document.getElementById('pmask').classList.remove('on');
+  document.getElementById('pmodal').classList.remove('on');
+}
+function copyPrompt(){ copyText(_promptText); }
+
+/* ================= AI 拆解/写脚本：生成指令，复制到任意 AI 跑 ================= */
+
+/* 对标拆解 prompt 构造 */
+function buildRefPrompt(){
+  const src=document.getElementById('ai-rf-src').value.trim();
+  if(!src)return null;
+  const fmt=document.getElementById('ai-rf-fmt').value;
+  const niche=document.getElementById('ai-rf-niche').value.trim();
+  if(LANG==='en'){
+    return 'You are a seasoned content strategist skilled at reverse-engineering viral posts. Please break down the '+L(fmt)+' hit below and extract reusable methods, '+
+(niche?'and give migration advice for my niche "'+niche+'".':'')+'\n\n'+
+'[Hit text to break down]\n'+src+'\n\n'+
+'Analyze along these 6 dimensions, each explaining "how it does it" + "why it works":\n'+
+'1. Opening hook: what technique grabs attention in the first 3 seconds / two lines (e.g. specific numbers, pain point, contrast, suspense, persona), classify and explain.\n'+
+'2. Structure: what is the overall framework (e.g. pain → method → result → CTA), break out the skeleton section by section.\n'+
+'3. Emotion & resonance: which emotions it mainly triggers, and via which details.\n'+
+'4. Why it went viral: from topic, expression and platform-mechanism angles, summarize 2-3 core reasons.\n'+
+'5. Reusable checklist: distill a copyable one-line "hook formula" and "structure template" I can apply directly.\n'+
+(niche?'6. Migrate to my niche: give 3 topics I can start on immediately, applying its hook and structure.\n':'6. Extend: give 3 new topic directions using the same techniques.\n')+
+'\nOutput in clear points, concise and actionable — no generic fluff.';
+  }
+  return '你是一位资深的自媒体内容操盘手，擅长拆解爆款的底层逻辑。请拆解下面这条'+fmt+'爆款，帮我提炼出可复用的方法，'+
+(niche?'并结合我的赛道「'+niche+'」给出迁移建议。':'')+'\n\n'+
+'【待拆解的爆款原文】\n'+src+'\n\n'+
+'请按以下 6 个维度逐条分析，每条讲清楚「它怎么做的」+「为什么有效」：\n'+
+'1. 开头钩子：前 3 秒/前两行用了什么手法抓住人（如具体数字、痛点、反差、悬念、身份代入等），归类并说明。\n'+
+'2. 内容结构：整体是什么框架（如 痛点→方法→结果→引导），逐段拆出结构骨架。\n'+
+'3. 情绪与共鸣：它主要调动了读者的什么情绪，靠哪些细节做到的。\n'+
+'4. 为什么会火：从选题、表达、平台机制角度，总结 2-3 个核心原因。\n'+
+'5. 可复用清单：把它能被我直接套用的「钩子公式」和「结构模板」各提炼成一句可复制的模板。\n'+
+(niche?'6. 迁移到我的赛道：给出 3 个我可以立刻上手的选题，套用它的钩子和结构。\n':'6. 举一反三：给出 3 个可套用同样手法的新选题方向。\n')+
+'\n输出请分点、简洁、可直接执行，不要泛泛而谈。';
+}
+/* 对标拆解按钮区 */
+function renderRefBtns(){
+  const box=document.getElementById('ai-rf-btns'); if(!box)return;
+  box.innerHTML = '<button class="btn b-main" onclick="genRefPrompt()">'+L('🪄 生成拆解指令')+'</button>';
+}
+function genRefPrompt(){
+  const p=buildRefPrompt();
+  if(!p){toast(L('先把爆款文案粘进来'));document.getElementById('ai-rf-src').focus();return;}
+  showPrompt(L('爆款拆解指令'),L('复制去 AI 跑，拆完把钩子公式/结构模板存进资产库、把选题灵感记进灵感池。'),p);
+}
+
+
+function saveRef(){
+  const t=document.getElementById('rf-t').value.trim();
+  if(!t){toast(L('先填爆款标题'));document.getElementById('rf-t').focus();return;}
+  DB.refs.unshift({id:uid(),title:t,
+    plat:document.getElementById('rf-plat').value,
+    hk:document.getElementById('rf-hk').value,
+    heat:document.getElementById('rf-heat').value,
+    niche:document.getElementById('rf-niche').value.trim(),
+    why:document.getElementById('rf-why').value.trim(),at:today()});
+  clearForm(['rf-t','rf-niche','rf-why']); save(); renderTopic(); toast(L('收进雷达了 📡'));
+}
+function delRef(id){DB.refs=DB.refs.filter(x=>x.id!==id);save();renderTopic();toast(L('已删除'));}
+
+/* ================= 脚本资产库 ================= */
+const HOOK_FMLS=[
+  {k:'具体数字',t:'量化冲击',f:'开头砸一个具体、反差大的数字，越离谱越留人。',e:'我副业第一个月只赚 240 块，第 6 个月做到 2 万——只改对了这 3 件事。'},
+  {k:'痛点扎心',t:'先说你的难',f:'第一句直接戳中对方正卡着的事，让 TA 觉得"说的就是我"。',e:'接单最崩溃的不是活多，是改到第 8 稿还被说"没感觉"。'},
+  {k:'反差反常识',t:'打破预期',f:'先抛一个和大家默认认知相反的结论，制造"啊？"的停顿。',e:'别急着做私域。粉丝多不等于能变现，我踩过这个坑。'},
+  {k:'结果前置',t:'先给答案',f:'把最爽的结果摆最前，再倒回去讲怎么做到。',e:'先说结论：这方法我用了 3 个月，涨粉 2000，没投一分钱。'},
+  {k:'身份代入',t:'精准喊人',f:'开头点名目标人群，让对的人一秒对号入座。',e:'如果你也是上班族、想搞副业又怕耽误正职，这条看完。'},
+  {k:'悬念提问',t:'留个钩子',f:'抛一个对方很想知道答案、但你偏不马上说的问题。',e:'为什么同样的活，有人报 800 有人报 3000？差的不是技术。'}
+];
+const TPLS={
+  '视频':[
+    {k:'痛点解决型',t:'最稳的万能结构',f:'痛点开场→我踩的坑→3个方法→结果对比→引导关注',e:'适合教程/避坑类，完播和收藏都稳。'},
+    {k:'故事反转型',t:'适合涨粉',f:'反常识开场→铺垫→反转→揭示原因→观点升华',e:'情绪拉满，评论区容易吵起来带互动。'},
+    {k:'清单盘点型',t:'易保存',f:'一句话承诺 N 个干货→逐条快节奏给→结尾催收藏',e:'信息密度高，收藏率高但涨粉一般。'}
+  ],
+  '图文':[
+    {k:'干货清单型',t:'小红书最爱',f:'标题给数字承诺→首图放重点→正文分点→结尾引导收藏',e:'封面标题决定 80% 打开率，务必打磨。'},
+    {k:'个人故事型',t:'涨粉利器',f:'自曝经历开场→真实过程→转折→总结方法→留互动钩子',e:'真实感强，容易被"自己人"关注。'},
+    {k:'对比测评型',t:'高信任',f:'纠结点开场→维度对比表→我的选择→适合谁',e:'决策类内容，转化到私域强。'}
+  ]
+};
+function renderHookFmls(){
+  document.getElementById('hook-fmls').innerHTML=HOOK_FMLS.map((f,i)=>
+    '<div class="fml"><div class="fh"><span class="fk">'+esc(L(f.t))+'</span><span class="ft">'+esc(L(f.k))+'</span></div>'+
+    '<div class="ff">'+esc(L(f.f))+'</div><div class="fe">'+L('例：')+esc(L(f.e))+'</div>'+
+    '<button class="btn b-sm b-line fbtn" onclick="useHook('+i+')">'+L('用这个 · 复制示例')+'</button></div>').join('');
+}
+function useHook(i){
+  const f=HOOK_FMLS[i]; if(!f)return;
+  copyText(L(f.e));
+  const kk=document.getElementById('as-k'); if(kk)kk.value='开头钩子';
+  const tt=document.getElementById('as-t'); if(tt)tt.value=L(f.e);
+  toast(L('示例已复制并填入下方，改成你自己的再存库'));
+}
+let tplFmt='视频';
+function renderTplFmls(){
+  document.getElementById('tpl-tags').innerHTML=['视频','图文'].map(k=>
+    '<button class="'+(tplFmt===k?'on':'')+'" onclick="tplFmt=\''+k+'\';renderTplFmls()">'+L(k)+'</button>').join('');
+  document.getElementById('tpl-fmls').innerHTML=(TPLS[tplFmt]||[]).map(f=>
+    '<div class="fml"><div class="fh"><span class="fk">'+esc(L(f.t))+'</span><span class="ft">'+esc(L(f.k))+'</span></div>'+
+    '<div class="ff">'+esc(L(f.f))+'</div><div class="fe">'+esc(L(f.e))+'</div>'+
+    '<button class="btn b-sm b-line fbtn" onclick="copyText('+JSON.stringify(L(f.f))+')">'+L('复制结构')+'</button></div>').join('');
+}
+/* ================= AI 脚本生成器 ================= */
+function renderScriptGen(){
+  /* 选题下拉：未发布的选题 */
+  const sel=document.getElementById('sg-topic'); if(!sel)return;
+  const cur=sel.value;
+  sel.innerHTML=['<option value="">'+L('— 手写主题 —')+'</option>'].concat(
+    pending().map(x=>'<option value="'+x.id+'">'+esc(x.title.slice(0,28))+' · '+esc(L(x.lib))+'</option>')).join('');
+  sel.value=cur;
+  /* 钩子下拉：内置公式 + 我的开头钩子资产 */
+  const hk=document.getElementById('sg-hook');
+  const hkOpts=['<option value="">'+L('AI 帮我挑最合适的')+'</option>']
+    .concat(HOOK_FMLS.map(f=>'<option value="'+esc(L(f.t))+'：'+esc(L(f.f))+'">'+esc(L(f.t))+' · '+esc(L(f.k))+'</option>'))
+    .concat(DB.assets.filter(a=>a.kind==='开头钩子').map(a=>'<option value="'+esc(a.text)+'">'+L('我的钩子：')+esc(a.text.slice(0,16))+'</option>'));
+  const hkc=hk.value; hk.innerHTML=hkOpts.join(''); hk.value=hkc;
+  /* 结构下拉：按当前形态给 */
+  refreshStructOpts();
+  renderScriptBtns();
+}
+function refreshStructOpts(){
+  const fmt=document.getElementById('sg-fmt').value;
+  const st=document.getElementById('sg-struct');
+  const stc=st.value;
+  const list=(TPLS[fmt]||[]).map(f=>'<option value="'+esc(L(f.t))+'：'+esc(L(f.f))+'">'+esc(L(f.t))+' · '+esc(L(f.f)).slice(0,14)+'…</option>');
+  st.innerHTML=['<option value="">'+L('AI 帮我挑最合适的')+'</option>'].concat(list).join('');
+  st.value=stc;
+}
+function sgPickTopic(){
+  const id=document.getElementById('sg-topic').value;
+  const x=DB.items.find(i=>i.id===id);
+  if(x){
+    document.getElementById('sg-theme').value=x.out||x.title;
+    if(x.fmt){document.getElementById('sg-fmt').value=x.fmt;refreshStructOpts();}
+  }
+}
+function buildScriptPrompt(){
+  const theme=document.getElementById('sg-theme').value.trim();
+  if(!theme)return null;
+  const fmt=document.getElementById('sg-fmt').value;
+  const plat=document.getElementById('sg-plat').value;
+  const hook=document.getElementById('sg-hook').value;
+  const struct=document.getElementById('sg-struct').value;
+  const points=document.getElementById('sg-points').value.trim();
+  const isVideo=fmt.indexOf('视频')>=0;
+  if(LANG==='en'){
+    return 'You are a content director skilled at writing viral '+L(plat)+' posts. Please write a complete '+(isVideo?'voiceover script':'text/graphic copy')+' for a '+L(fmt)+'.\n\n'+
+'[Theme] '+theme+'\n'+
+'[Platform] '+L(plat)+' (match this platform\'s tone and user habits)\n'+
+(hook?'[Specified opening hook] '+hook+'\n':'[Opening hook] Choose the best from "Specific numbers / Pain point / Counterintuitive / Result first / Persona / Cliffhanger" and explain why.\n')+
+(struct?'[Specified structure] '+struct+'\n':'[Structure] Pick the viral structure best suited to this theme.\n')+
+(points?'[Must-include points / my real experience] '+points+'\n':'')+
+'\nPlease output:\n'+
+'1. 3 alternative titles (strong hook, specific info, ready to use);\n'+
+(isVideo?
+'2. Full voiceover script: mark [Golden 3-sec opening] [Body sections] [Ending CTA to follow/save], each section with a shooting/visual note;\n3. 2 alternative openings for the first 3 seconds, for A/B testing.\n':
+'2. Full text copy: mark [Cover title] [First-image copy] [Bulleted body] [Ending CTA to save/follow];\n3. 3 optional hashtags.\n')+
+'\nRequirements: conversational, authentic, no slogans; high info density so readers gain something or want to share.';
+  }
+  return '你是一位擅长写'+plat+'爆款的自媒体编导。请帮我写一条'+fmt+'的完整'+(isVideo?'口播脚本':'图文文案')+'。\n\n'+
+'【主题】'+theme+'\n'+
+'【平台】'+plat+'（请贴合该平台的语感和用户习惯）\n'+
+(hook?'【指定开头钩子】'+hook+'\n':'【开头钩子】请从「具体数字/痛点扎心/反差反常识/结果前置/身份代入/悬念提问」中选最合适的，并说明为什么这么选。\n')+
+(struct?'【指定内容结构】'+struct+'\n':'【内容结构】请自选一个最适合本主题的爆款结构。\n')+
+(points?'【必须包含的要点/我的真实经历】'+points+'\n':'')+
+'\n请输出：\n'+
+'1. 3 个备选标题（钩子感强、含具体信息，可直接用）；\n'+
+(isVideo?
+'2. 完整口播脚本：标注【黄金3秒开头】【正文分段】【结尾引导关注/收藏】，每段配一句拍摄/画面提示；\n3. 前 3 秒的 2 个备选开头，供 A/B 测试。\n':
+'2. 完整图文文案：标注【封面标题】【首图文案】【正文分点】【结尾引导收藏/关注】；\n3. 3 个可选话题标签。\n')+
+'\n要求：口语化、有真实感、别喊口号；信息密度高，能让人看完有收获或想转发。';
+}
+function renderScriptBtns(){
+  const box=document.getElementById('sg-btns'); if(!box)return;
+  box.innerHTML = '<button class="btn b-main" onclick="genScriptPrompt()">'+L('🪄 生成写脚本指令')+'</button>';
+}
+function genScriptPrompt(){
+  const p=buildScriptPrompt();
+  if(!p){toast(L('先选一条选题或写个主题'));document.getElementById('sg-theme').focus();return;}
+  showPrompt(L('写脚本指令'),L('复制去 AI 跑出初稿，再按你的真实语气改。跑得好用的开头，记得回来存进资产库。'),p);
+}
+
+function saveAsset(){
+  const t=document.getElementById('as-t').value.trim();
+  if(!t){toast(L('把内容抄进来'));document.getElementById('as-t').focus();return;}
+  var rec={id:uid(),text:t,kind:document.getElementById('as-k').value,
+    src:document.getElementById('as-s').value.trim(),rate:+document.getElementById('as-r').value,at:today()};
+  DB.assets.unshift(rec);
+  clearForm(['as-t','as-s']); save(); renderAssets(); toast(L('存进资产库了'));
+}
+function delAsset(id){const a=DB.assets.find(x=>x.id===id);DB.assets=DB.assets.filter(a=>a.id!==id);save();renderAssets();toast(L('已删除'));}
+let asFilter='全部';
+function renderAssets(){
+  const kinds=['全部','开头钩子','标题公式','结尾CTA','结构套路'];
+  document.getElementById('as-tags').innerHTML=kinds.filter(k=>k==='全部'||DB.assets.some(a=>a.kind===k))
+    .map(k=>{const n=k==='全部'?DB.assets.length:DB.assets.filter(a=>a.kind===k).length;
+      return '<button class="'+(asFilter===k?'on':'')+'" onclick="asFilter=\''+k+'\';renderAssets()">'+L(k)+' '+n+'</button>';}).join('');
+  const q=(document.getElementById('as-search').value||'').trim().toLowerCase();
+  let arr=[...DB.assets];
+  if(asFilter!=='全部')arr=arr.filter(a=>a.kind===asFilter);
+  if(q)arr=arr.filter(a=>(a.text+' '+(a.src||'')).toLowerCase().includes(q));
+  arr.sort((a,b)=>(+b.rate||0)-(+a.rate||0));
+  document.getElementById('as-q').textContent=arr.length+L(' 条');
+  document.getElementById('as-body').innerHTML=arr.length?arr.map(a=>
+    '<tr><td data-l="'+L('原文')+'" class="nl"><div class="tt">'+esc(a.text)+'</div>'+(a.src?'<div class="ts">'+L('来源：')+esc(a.src)+'</div>':'')+'</td>'+
+    '<td data-l="'+L('类型')+'"><span class="pill p-brand">'+esc(L(a.kind))+'</span></td>'+
+    '<td data-l="'+L('效果')+'">'+'★'.repeat(+a.rate||0)+'</td>'+
+    '<td class="nl"><div class="ta"><button class="btn b-sm b-line" onclick="copyAsset(\''+a.id+'\')">'+L('复制')+'</button>'+
+    '<button class="btn b-sm b-del" onclick="delAsset(\''+a.id+'\')">'+L('删')+'</button></div></td></tr>'
+  ).join(''):'<tr><td class="nl"><div class="empty"><div class="e1">🗂️</div><div class="e2">'+L('没有匹配的资产')+'</div><div class="e3">'+L('换个筛选，或上面存一条')+'</div></div></td></tr>';
+}
+function copyAsset(id){const a=DB.assets.find(x=>x.id===id);if(a)copyText(a.text);}
+function copyText(s){
+  const ta=document.createElement('textarea');ta.value=s;ta.style.position='fixed';ta.style.left='-9999px';
+  document.body.appendChild(ta);ta.select();
+  try{document.execCommand('copy');toast(L('复制好了，去粘贴吧'));}catch(e){toast(L('复制失败，长按选中手动复制'));}
+  document.body.removeChild(ta);
+}
+
+/* ================= 发布板块 ================= */
+const SLOTS=[
+  {p:'抖音',s:'早 7-9 通勤 · 午 12-14 · 晚 18-22（黄金）',c:'#0F6E56'},
+  {p:'小红书',s:'早 9-10 · 午休 12-13 · 晚 19-23（最强）',c:'#993556'},
+  {p:'视频号',s:'早 7-8 · 晚 20-22（中老年活跃）',c:'#185FA5'},
+  {p:'公众号',s:'早 7-9 通勤 · 晚 20-22 睡前',c:'#BA7517'},
+  {p:'B站',s:'午 12-13 · 晚 19-23 · 周末全天',c:'#534AB7'}
+];
+function renderSlotRef(){
+  document.getElementById('slot-ref').innerHTML='<div class="fmls">'+SLOTS.map(x=>
+    '<div class="fml" style="border-left:3px solid '+x.c+'"><div class="fk">'+esc(L(x.p))+'</div><div class="ff">'+esc(L(x.s))+'</div></div>').join('')+'</div>';
+}
+const GOLDEN=[
+  '发布后检查页面和链接是否正常，及时回复真实评论',
+  '把内容<b>转到私域群/朋友圈</b>，第一波流量往里导',
+  '<b>盯评论区</b>：15 分钟内回复每一条，评论越多越推',
+  '主动在评论区<b>留一个引导互动的问题</b>（如"你踩过哪个坑？"）',
+  '首波数据不对就<b>改标题/封面</b>（图文可改，抓住黄金窗口）'
+];
+function renderGolden(){
+  document.getElementById('g1list').innerHTML=GOLDEN.map(g=>
+    '<div class="g1i"><span class="gd"></span><span class="gt">'+L(g)+'</span></div>').join('');
+  const done=(DB.meta.golden||[]).includes(today());
+  const b=document.getElementById('g1-btn');
+  b.textContent=done?L('今天已盯完 ✓'):L('这条的黄金 1 小时我盯完了 ✓'); b.disabled=done;
+}
+function doGolden(){
+  const t=today();
+  if(DB.meta.golden.includes(t)){toast(L('今天已经盯完啦'));return;}
+  DB.meta.golden.push(t);save();renderGolden();toast(L('黄金 1 小时打卡 ⚡ 稳住这个习惯'));
+}
+let pFilter='全部';
+function renderPublish(){
+  renderSlotRef(); renderGolden();
+  const fs=['全部','待发','在写','待写','已发'];
+  document.getElementById('p-tags').innerHTML=fs.map(f=>{
+    const n=f==='全部'?DB.items.length:DB.items.filter(x=>x.stage===f).length;
+    return '<button class="'+(pFilter===f?'on':'')+'" onclick="pFilter=\''+f+'\';renderPublish()">'+L(f)+' '+n+'</button>';
+  }).join('');
+  let arr=[...DB.items];
+  if(pFilter!=='全部')arr=arr.filter(x=>x.stage===pFilter);
+  const t=today();
+  arr.sort((a,b)=>{
+    const ao=a.stage!=='已发'&&a.date&&dayDiff(a.date,t)>0?0:1, bo=b.stage!=='已发'&&b.date&&dayDiff(b.date,t)>0?0:1;
+    return ao-bo||(a.date||'9').localeCompare(b.date||'9');
+  });
+  document.getElementById('pl-q').textContent=arr.length+L(' 条');
+  document.getElementById('pl-body').innerHTML=arr.length?arr.map(x=>{
+    const over=x.stage!=='已发'&&x.date&&dayDiff(x.date,t)>0;
+    const sp={'待写':'p-gray','在写':'p-warn','待发':'p-brand','已发':'p-ok'}[x.stage]||'p-gray';
+    return '<tr><td data-l="'+L('内容')+'" class="nl"><div class="tt">'+esc(x.title)+
+      (over?' <span class="pill p-red">'+L('逾期 ')+dayDiff(x.date,t)+L(' 天')+'</span>':'')+'</div>'+
+      (x.plat?'<div class="ts">'+esc(L(x.plat))+(x.slot?' · '+esc(L(x.slot)):'')+'</div>':'')+'</td>'+
+      '<td data-l="'+L('形态')+'">'+esc(x.fmt?L(x.fmt):'—')+'</td>'+
+      '<td data-l="'+L('计划发布')+'">'+(x.date?fmtDate(x.date):L('未排'))+'</td>'+
+      '<td data-l="'+L('状态')+'"><span class="pill '+sp+'">'+esc(L(x.stage))+'</span></td>'+
+      '<td class="nl"><div class="ta">'+
+        (x.stage!=='已发'?'<button class="btn b-sm b-ok" onclick="markSent(\''+x.id+'\')">'+L('标已发')+'</button>':'<button class="btn b-sm b-main" onclick="go(\'review\')">'+L('记数据')+'</button>')+
+        '<button class="btn b-sm b-line" onclick="editPub(\''+x.id+'\')">'+L('编辑')+'</button>'+
+        '<button class="btn b-sm b-del" onclick="delItem(\''+x.id+'\')">'+L('删')+'</button>'+
+        '</div></td></tr>';
+  }).join(''):'<tr><td class="nl"><div class="empty"><div class="e1">📅</div><div class="e2">'+L('这个状态下没有内容')+'</div><div class="e3">'+L('去选题库加一条并排上发布日')+'</div></div></td></tr>';
+}
+/* 发布排期：编辑弹层 */
+var _epId=null;
+function editPub(id){
+  const x=DB.items.find(t=>t.id===id); if(!x)return;
+  _epId=id;
+  document.getElementById('ep-title').textContent=x.title;
+  document.getElementById('ep-fmt').value=x.fmt||'视频';
+  document.getElementById('ep-stage').value=x.stage||'待写';
+  document.getElementById('ep-date').value=x.date||'';
+  document.getElementById('ep-plat').value=x.plat||'';
+  document.getElementById('ep-slot').value=x.slot||'';
+  document.getElementById('epmask').classList.add('on');
+  document.getElementById('epmodal').classList.add('on');
+}
+function closeEditPub(){
+  _epId=null;
+  document.getElementById('epmask').classList.remove('on');
+  document.getElementById('epmodal').classList.remove('on');
+}
+function savePub(){
+  const x=DB.items.find(t=>t.id===_epId); if(!x){closeEditPub();return;}
+  x.fmt=document.getElementById('ep-fmt').value;
+  x.stage=document.getElementById('ep-stage').value;
+  x.date=document.getElementById('ep-date').value||'';
+  x.plat=document.getElementById('ep-plat').value;
+  x.slot=document.getElementById('ep-slot').value;
+  if(x.stage==='已发'&&!x.date)x.date=today();
+  closeEditPub(); save(); renderAll(); toast(L('这条排期改好了'));
+}
+
+/* ================= 复盘板块 ================= */
+function judge(p){
+  const av=avgViews();
+  if(!av||!p.views)return{t:L('待观察'),c:'p-gray'};
+  const r=p.views/av;
+  if(r>=1.5)return{t:L('爆了 +')+Math.round((r-1)*100)+'%',c:'p-ok'};
+  if(r>=1.1)return{t:L('达标 +')+Math.round((r-1)*100)+'%',c:'p-ok'};
+  if(r>=0.8)return{t:L('及格'),c:'p-warn'};
+  return{t:L('低于预期 -')+Math.round((1-r)*100)+'%',c:'p-red'};
+}
+/* 归因：按 lib/hook/slot 分组算平均曝光 */
+function attrStats(dim){
+  const m={};
+  posted().filter(p=>+p.views>0).forEach(p=>{
+    const k=(p[dim]||'未标').toString().trim()||'未标';
+    if(!m[k])m[k]={name:k,n:0,views:0};
+    m[k].n++;m[k].views+=+p.views||0;
+  });
+  return Object.values(m).map(x=>({...x,avg:x.n?x.views/x.n:0})).sort((a,b)=>b.avg-a.avg);
+}
+function toggleFmtFields(){
+  const isVideo=document.getElementById('r-fmt').value==='视频';
+  document.getElementById('fd-wr').style.display=isVideo?'flex':'none';
+}
+function pickPosted(){
+  const id=document.getElementById('rv-pick').value;
+  const p=DB.items.find(x=>x.id===id);
+  if(!p){resetDataForm();return;}
+  document.getElementById('r-t').value=p.title||'';
+  if(p.plat)document.getElementById('r-pl').value=p.plat;
+  document.getElementById('r-fmt').value=p.fmt||'视频';
+  if(p.slot)document.getElementById('r-slot').value=p.slot;
+  if(p.hook)document.getElementById('r-hk').value=p.hook;
+  document.getElementById('r-v').value=p.views||'';
+  document.getElementById('r-wr').value=p.wr||'';
+  document.getElementById('r-l').value=p.likes||'';
+  document.getElementById('r-c').value=p.colls||'';
+  document.getElementById('r-m').value=p.cmts||'';
+  document.getElementById('r-f').value=p.fans||'';
+  document.getElementById('r-n').value=p.note||'';
+  toggleFmtFields();
+}
+function resetDataForm(){
+  document.getElementById('rv-pick').value='';
+  clearForm(['r-t','r-v','r-wr','r-l','r-c','r-m','r-f','r-n']);
+  toggleFmtFields();
+}
+function saveData(){
+  const t=document.getElementById('r-t').value.trim();
+  if(!t){toast(L('标题总得写一个'));document.getElementById('r-t').focus();return;}
+  const pickId=document.getElementById('rv-pick').value;
+  const data={title:t,plat:document.getElementById('r-pl').value,fmt:document.getElementById('r-fmt').value,
+    slot:document.getElementById('r-slot').value,hook:document.getElementById('r-hk').value,
+    views:+document.getElementById('r-v').value||0,wr:+document.getElementById('r-wr').value||0,
+    likes:+document.getElementById('r-l').value||0,colls:+document.getElementById('r-c').value||0,
+    cmts:+document.getElementById('r-m').value||0,fans:+document.getElementById('r-f').value||0,
+    note:document.getElementById('r-n').value.trim(),stage:'已发'};
+  const ex=DB.items.find(x=>x.id===pickId);
+  if(ex){ Object.assign(ex,data); if(!ex.date)ex.date=today(); }
+  else { DB.items.unshift(Object.assign({id:uid(),out:'',lib:'日常',mat:'',date:today(),at:today()},data)); }
+  var _savedReview={title:data.title,wr:data.wr,views:data.views,likes:data.likes,colls:data.colls,cmts:data.cmts,fans:data.fans,date:ex?ex.date:today()};
+  resetDataForm(); save(); renderAll();
+
+  toast(L('数据存好了，判定已自动算出'));
+}
+function fillPickList(){
+  const sel=document.getElementById('rv-pick'); const cur=sel.value;
+  const opts=['<option value="">'+L('— 新记一条 —')+'</option>'].concat(
+    DB.items.filter(x=>x.stage==='已发').map(p=>'<option value="'+p.id+'">'+esc(p.title.slice(0,26))+(+p.views>0?L('（已录）'):L('（待录）'))+'</option>'));
+  sel.innerHTML=opts.join(''); sel.value=cur;
+}
+let attrDim='lib';
+function renderReview(){
+  fillPickList(); toggleFmtFields();
+  const av=avgViews();
+  document.getElementById('rv-kpi').innerHTML=[
+    {l:L('互动率'),v:avgER().toFixed(2)+'%',s:L('赞+藏+评 / 曝光')},
+    {l:L('关注率'),v:avgFollow().toFixed(2)+'%',s:L('涨粉 / 曝光')},
+    {l:L('完播率'),v:avgWatch()?avgWatch().toFixed(1)+'%':'—',s:L('视频类均值')},
+    {l:L('曝光基准'),v:num(Math.round(av)),s:L('你自己的平均线')}
+  ].map(k=>'<div class="kpi"><div class="l">'+k.l+'</div><div class="v">'+k.v+'</div><div class="s">'+k.s+'</div></div>').join('');
+
+  drawLine();
+  /* 归因 */
+  document.getElementById('attr-tags').innerHTML=[['lib','按选题库'],['hook','按钩子'],['slot','按时段'],['fmt','按形态'],['plat','按平台']]
+    .map(([d,l])=>'<button class="'+(attrDim===d?'on':'')+'" onclick="attrDim=\''+d+'\';renderReview()">'+L(l)+'</button>').join('');
+  drawAttr();
+
+  /* 全部内容 */
+  const pls=['全部','小红书','抖音','视频号','公众号','B站','其他'];
+  document.getElementById('a-tags').innerHTML=pls.filter(p=>p==='全部'||posted().some(x=>x.plat===p))
+    .map(p=>{const n=p==='全部'?posted().length:posted().filter(x=>x.plat===p).length;
+      return '<button class="'+(aFilter===p?'on':'')+'" onclick="aFilter=\''+p+'\';renderReview()">'+L(p)+' '+n+'</button>';}).join('');
+  let arr=posted();
+  if(aFilter!=='全部')arr=arr.filter(p=>p.plat===aFilter);
+  arr=[...arr].sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  document.getElementById('al-q').textContent=arr.length+L(' 条');
+  document.getElementById('al-body').innerHTML=arr.length?arr.map(p=>{
+    const j=judge(p);
+    return '<tr><td data-l="'+L('标题')+'" class="nl"><div class="tt">'+esc(p.title)+'</div>'+
+      '<div class="ts">'+esc(p.plat?L(p.plat):'')+' · '+esc(p.fmt?L(p.fmt):'')+' · '+fmtDate(p.date)+(p.slot?' · '+esc(L(p.slot)):'')+' · '+esc(p.hook?L(p.hook):'')+
+      (+p.wr>0?' · '+L('完播 ')+(+p.wr).toFixed(1)+'%':'')+(p.note?'<br>'+L('笔记：')+esc(p.note):'')+'</div></td>'+
+      '<td data-l="'+L('曝光')+'" class="num">'+num(p.views)+'</td>'+
+      '<td data-l="'+L('互动率')+'" class="num">'+er(p).toFixed(2)+'%</td>'+
+      '<td data-l="'+L('涨粉')+'" class="num">'+num(p.fans)+'</td>'+
+      '<td data-l="'+L('判定')+'"><span class="pill '+j.c+'">'+j.t+'</span></td>'+
+      '<td class="nl"><div class="ta"><button class="btn b-sm b-line" onclick="editData(\''+p.id+'\')">'+L('改')+'</button>'+
+      '<button class="btn b-sm b-del" onclick="delItem(\''+p.id+'\')">'+L('删')+'</button></div></td></tr>';
+  }).join(''):'<tr><td class="nl"><div class="empty"><div class="e1">📝</div><div class="e2">'+L('还没有已发内容的数据')+'</div><div class="e3">'+L('上面选一条已发内容记数据')+'</div></div></td></tr>';
+}
+let aFilter='全部';
+function editData(id){document.getElementById('rv-pick').value=id;pickPosted();document.querySelector('[data-v="review"] .card').scrollIntoView({behavior:'smooth',block:'start'});}
+
+function drawLine(){
+  const box=document.getElementById('c-line');
+  const ps=posted().filter(p=>+p.views>0).sort((a,b)=>(a.date||'').localeCompare(b.date||'')).slice(-8);
+  if(ps.length<2){box.innerHTML='<div class="empty"><div class="e1">📈</div><div class="e2">'+L('记满 2 条数据才能出走势')+'</div></div>';return;}
+  const nar=window.innerWidth<=768;
+  const W=nar?Math.max(340,ps.length*66):740,H=nar?230:260,LM=nar?46:58,R=nar?46:58,T=28,B=44;
+  const vs=ps.map(p=>+p.views||0),fs=ps.map(p=>+p.fans||0);
+  const vmax=Math.max(...vs,1)*1.18,fmax=Math.max(...fs,1)*1.25;
+  const x=i=>LM+(W-LM-R)*(ps.length===1?0.5:i/(ps.length-1));
+  const yv=v=>T+(H-T-B)*(1-v/vmax), yf=v=>T+(H-T-B)*(1-v/fmax);
+  let g='';
+  for(let i=0;i<=3;i++){const y=T+(H-T-B)*(1-i/3);
+    g+='<line x1="'+LM+'" y1="'+y.toFixed(1)+'" x2="'+(W-R)+'" y2="'+y.toFixed(1)+'" stroke="#F2EDE6"/>';
+    g+='<text x="'+(LM-6)+'" y="'+(y+4).toFixed(1)+'" text-anchor="end" font-size="'+(nar?9:10)+'" fill="#948C83">'+num(Math.round(vmax*i/3))+'</text>';
+    g+='<text x="'+(W-R+6)+'" y="'+(y+4).toFixed(1)+'" font-size="'+(nar?9:10)+'" fill="#2E7D52">'+num(Math.round(fmax*i/3))+'</text>';}
+  g+='<text x="'+LM+'" y="'+(T-7)+'" font-size="'+(nar?9:10)+'" fill="var(--brand)" font-weight="700">'+L('左轴：曝光')+'</text>';
+  g+='<text x="'+(W-R)+'" y="'+(T-7)+'" text-anchor="end" font-size="'+(nar?9:10)+'" fill="#2E7D52" font-weight="700">'+L('右轴：涨粉')+'</text>';
+  const av=avgViews();
+  if(av){const y=yv(av);g+='<line x1="'+LM+'" y1="'+y.toFixed(1)+'" x2="'+(W-R)+'" y2="'+y.toFixed(1)+'" stroke="#8B5CB8" stroke-width="1.4" stroke-dasharray="4 3"/>';}
+  const base=T+(H-T-B);
+  g+='<polygon points="'+LM+','+base+' '+ps.map((p,i)=>x(i).toFixed(1)+','+yf(+p.fans||0).toFixed(1)).join(' ')+' '+(W-R)+','+base+'" fill="#2E7D52" opacity="0.10"/>';
+  g+='<polyline points="'+ps.map((p,i)=>x(i).toFixed(1)+','+yv(+p.views||0).toFixed(1)).join(' ')+'" fill="none" stroke="var(--brand)" stroke-width="2.2" stroke-linejoin="round"/>';
+  g+='<polyline points="'+ps.map((p,i)=>x(i).toFixed(1)+','+yf(+p.fans||0).toFixed(1)).join(' ')+'" fill="none" stroke="#2E7D52" stroke-width="1.7" stroke-dasharray="5 3"/>';
+  ps.forEach((p,i)=>{const cx=x(i);
+    g+='<circle cx="'+cx.toFixed(1)+'" cy="'+yv(+p.views||0).toFixed(1)+'" r="3.4" fill="#fff" stroke="var(--brand)" stroke-width="2"/>';
+    g+='<circle cx="'+cx.toFixed(1)+'" cy="'+yf(+p.fans||0).toFixed(1)+'" r="2.8" fill="#2E7D52"/>';
+    if(!nar||i%2===0||i===ps.length-1){const anch=i===0?'start':(i===ps.length-1?'end':'middle');
+      g+='<text x="'+cx.toFixed(1)+'" y="'+(H-B+17)+'" text-anchor="'+anch+'" font-size="'+(nar?9:10)+'" fill="#948C83">'+fmtDate(p.date)+'</text>';}});
+  box.innerHTML='<svg viewBox="0 0 '+W+' '+H+'" style="min-width:'+(nar?W:0)+'px">'+g+'</svg>';
+}
+function drawAttr(){
+  const box=document.getElementById('c-attr');
+  const st=attrStats(attrDim);
+  if(!st.length){box.innerHTML='<div class="empty"><div class="e1">🔬</div><div class="e2">'+L('记几条已发数据才能归因')+'</div><div class="e3">'+L('去上面记一条')+'</div></div>';return;}
+  const nar=window.innerWidth<=768;
+  const W=nar?330:700,rowH=nar?42:40,LM=nar?92:150,R=nar?52:66,T=8;
+  const av=avgViews(),H=T+st.length*rowH+(av?20:8);
+  const max=Math.max(...st.map(s=>s.avg),1);
+  let g='';
+  st.forEach((s,i)=>{const y=T+i*rowH,bh=nar?15:17;
+    const w=Math.max(2,(W-LM-R)*(s.avg/max));
+    const rel=av?s.avg/av:1;const col=rel>=1.2?'#2E7D52':rel<=0.8?'#C4362F':'#B4761A';
+    const nmFull=L(s.name);
+    const nm=nar&&nmFull.length>7?nmFull.slice(0,7)+'…':(nmFull.length>12?nmFull.slice(0,12)+'…':nmFull);
+    g+='<text x="'+(LM-8)+'" y="'+(y+bh-3)+'" text-anchor="end" font-size="'+(nar?10.5:12)+'" fill="#5C554E">'+esc(nm)+'</text>';
+    g+='<rect x="'+LM+'" y="'+y+'" width="'+w+'" height="'+bh+'" rx="4" fill="'+col+'"/>';
+    g+='<text x="'+(LM+w+6)+'" y="'+(y+bh-3)+'" font-size="'+(nar?10:11.5)+'" fill="#231F1C" font-weight="700">'+num(Math.round(s.avg))+'</text>';
+    g+='<text x="'+(LM-8)+'" y="'+(y+bh+12)+'" text-anchor="end" font-size="'+(nar?9:10)+'" fill="#948C83">'+s.n+L(' 条')+'</text>';});
+  let ex='';
+  if(av){const x=LM+(W-LM-R)*(av/max);
+    ex+='<line x1="'+x+'" y1="'+T+'" x2="'+x+'" y2="'+(H-14)+'" stroke="#8B5CB8" stroke-width="1.4" stroke-dasharray="4 3"/>';
+    const lb=L('平均 ')+num(Math.round(av)),tw=lb.length*(nar?6:7)+8;
+    const tx=Math.min(Math.max(x-tw/2,LM),W-R-tw);
+    ex+='<rect x="'+tx+'" y="'+(H-13)+'" width="'+tw+'" height="13" rx="3" fill="#EFEAFB"/>';
+    ex+='<text x="'+(tx+tw/2)+'" y="'+(H-3)+'" text-anchor="middle" font-size="'+(nar?9:10)+'" fill="#7A5AF0" font-weight="700">'+lb+'</text>';}
+  box.innerHTML='<svg viewBox="0 0 '+W+' '+H+'">'+g+ex+'</svg>';
+}
+
+/* ================= 成就 ================= */
+function medals(){
+  const av=avgViews();
+  return [
+    {i:'🌱',n:'开张',c:'记第一条选题',got:DB.items.length>=1},
+    {i:'🗓️',n:'开过选题会',c:'完成一次每周选题会',got:DB.meta.weekMeet.length>=1},
+    {i:'📚',n:'库存充足',c:'选题库囤满 8 条待发',got:pending().length>=8},
+    {i:'🎬',n:'资产收藏家',c:'脚本资产存满 10 条',got:DB.assets.length>=10},
+    {i:'⚡',n:'盯过黄金1小时',c:'完成 3 次发布后黄金1小时',got:DB.meta.golden.length>=3},
+    {i:'📊',n:'有基准了',c:'记满 5 条已发数据',got:posted().filter(p=>+p.views>0).length>=5},
+    {i:'🚀',n:'出过爆款',c:'有内容超均值 1.5 倍',got:!!(av&&posted().some(p=>p.views/av>=1.5))},
+    {i:'🔥',n:'连更 7 天',c:'连续更新打卡 7 天',got:streak()>=7}
+  ];
+}
+function renderMe(){
+  const ms=medals();
+  document.getElementById('md-q').textContent=L('已得 ')+ms.filter(m=>m.got).length+'/'+ms.length;
+  document.getElementById('meds').innerHTML=ms.map(m=>
+    '<div class="med'+(m.got?' got':'')+'"><div class="i">'+m.i+'</div><div class="n">'+L(m.n)+'</div><div class="c">'+L(m.c)+'</div></div>').join('');
+  document.getElementById('me-kpi').innerHTML=[
+    {l:L('内容总数'),v:DB.items.length,s:L('条')},{l:L('已发'),v:posted().length,s:L('条')},
+    {l:L('脚本资产'),v:DB.assets.length,s:L('条')},{l:L('连续更新'),v:streak(),s:L('天')}
+  ].map(k=>'<div class="kpi"><div class="l">'+k.l+'</div><div class="v">'+k.v+'</div><div class="s">'+k.s+'</div></div>').join('');
+}
+function downloadFile(name, text, mime){
+  const blob=new Blob([text],{type:mime});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+function exportJSON(){
+  downloadFile('workbench-backup-'+today()+'.json',JSON.stringify({format:'workbench-offline-v1',exported_at:new Date().toISOString(),data:DB},null,2),'application/json;charset=utf-8');
+}
+function csvCell(value){
+  const s=String(value==null?'':value);
+  return '"'+s.replace(/"/g,'""')+'"';
+}
+function exportCSV(){
+  const fields=['id','title','out','lib','fmt','plat','slot','hook','stage','date','views','wr','likes','colls','cmts','fans','note'];
+  const rows=[fields.join(',')].concat(DB.items.map(item=>fields.map(k=>csvCell(item[k])).join(',')));
+  downloadFile('workbench-content-'+today()+'.csv','\ufeff'+rows.join('\r\n'),'text/csv;charset=utf-8');
+}
+function importJSON(input){
+  const file=input.files&&input.files[0];input.value='';if(!file)return;
+  if(file.size>10*1024*1024){toast('备份文件超过 10 MB');return;}
+  const reader=new FileReader();
+  reader.onload=()=>{
+    let data;
+    try{
+      const payload=JSON.parse(String(reader.result||''));
+      data=payload&&payload.format==='workbench-offline-v1'?payload.data:payload;
+      if(!data||typeof data!=='object'||!['items','assets','ideas','refs','todos'].every(k=>Array.isArray(data[k]))||!data.meta||typeof data.meta!=='object')throw new Error('invalid backup');
+    }catch(e){toast('不是有效的工作台 JSON 备份');return;}
+    confirmBox('导入备份？','会用备份内容替换当前浏览器的数据。建议先导出一份现有备份。',()=>{
+      DB=data;save();renderAll();toast('备份已导入');
+    });
+  };
+  reader.readAsText(file);
+}
+
+function clearDemo(){
+  const n=['items','assets','ideas','refs','todos'].reduce((s,k)=>s+DB[k].filter(x=>x.demo).length,0);
+  if(!n){toast(L('已经没有示例内容了'));return;}
+  confirmBox(L('清空示例内容？'),L('会删掉')+n+L('条自带示例，你自己填的都留着。'),()=>{
+    ['items','assets','ideas','refs','todos'].forEach(k=>DB[k]=DB[k].filter(x=>!x.demo));
+    DB.meta.demo=false;save();renderAll();toast(L('清好了，这下全是你自己的'));
+  });
+}
+function resetAll(){
+  confirmBox(L('确定全部重置？'),L('所有内容都会删掉且无法恢复。'),()=>{
+    DB={items:[],assets:[],ideas:[],refs:[],todos:[],meta:{demo:false,hidden:[],checkins:[],weekMeet:[],golden:[],expAt:null,ncAt:0}};
+    save();renderAll();toast(L('已重置'));
+  });
+}
+
+function renderAll(){
+  renderHome(); renderTopic(); renderHookFmls(); renderTplFmls(); renderScriptGen(); renderAssets();
+  renderPublish(); renderReview(); renderMe();
+  applyStaticI18N();
+}
+document.getElementById('td-d').value=today();
+document.getElementById('t-d').value=today();
+
+document.getElementById('mk-ok').onclick=()=>{const f=_cb;closeBox();if(f)f();};
+document.getElementById('mk-no').onclick=closeBox;
+document.getElementById('mask').onclick=closeBox;
+document.querySelectorAll('.side button[data-v],.mtab button[data-v]').forEach(b=>b.onclick=()=>go(b.dataset.v));
+let _rz; window.addEventListener('resize',()=>{clearTimeout(_rz);_rz=setTimeout(renderAll,220);});
+renderAll();
+</script>
+</body>
+</html>

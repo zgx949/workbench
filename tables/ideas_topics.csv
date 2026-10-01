@@ -1,0 +1,3 @@
+﻿id,record_type,title,source,library,outline,format,stage,planned_date,materials,created_at,updated_at,deleted_at
+idea-demo-001,idea,新人接单时，先确认哪三件事？,评论区问题,,,,,,,2026-10-01T09:00:00+08:00,2026-10-01T09:00:00+08:00,
+topic-demo-001,topic,报价前先问清这三件事,idea-demo-001,日常,用一张清单展示沟通顺序,视频,待写,2026-10-03,虚构对话截图,2026-10-01T09:10:00+08:00,2026-10-01T09:10:00+08:00,

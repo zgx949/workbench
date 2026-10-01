@@ -1,0 +1,2 @@
+﻿id,topic_id,title,platform,format,published_at,time_slot,impressions,completion_rate,likes,saves,comments,new_followers,conversions,notes,updated_at
+metric-demo-001,topic-demo-001,报价前先问清这三件事,抖音,视频,2026-10-03T19:00:00+08:00,晚间,1200,36.5,42,18,7,5,0,虚构数据，仅用于测试,2026-10-04T09:00:00+08:00
